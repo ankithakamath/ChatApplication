@@ -123,10 +123,6 @@ class LoginViewController: UIViewController {
         present(alert,animated: true)
     }
     
-    //    @objc func handleLogin(){
-    //        print("login sucessful")
-    //    }
-    
     @objc func handleSignup(){
         let vc = RegisterViewController()
         navigationController?.pushViewController(vc, animated: true)
@@ -156,7 +152,7 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //title = "Login"
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .white
         configureUI()
     }
     

@@ -11,23 +11,24 @@ import FirebaseAuth
 
 class NewMessageViewController: UIViewController {
     
-    var conversations:[ChatModel] = []
+    var chats:[Chats] = []
     let cellIdentifier = "userCell"
-    private var users = [User]()
-    private var results = [User]()
-    var searching = false
-    private var hasFetched = false
-    var currentUser: User?
+    var users : [UserData] = []
+    var hasFetched = false
+    var currentUser: UserData?
+    var searchUsers: [UserData] = []
     var collectionView: UICollectionView!
     var uid :String = FirebaseAuth.Auth.auth().currentUser!.uid
+    private var inSearchMode: Bool {
+        return !searchController.searchBar.text!.isEmpty
+    }
     
-    
-//    private let searchBar: UISearchBar = {
-//        let searchBar = UISearchBar()
-//        searchBar.placeholder = "search for contacts"
-//
-//        return searchBar
-//    }()
+    //    private let searchBar: UISearchBar = {
+    //        let searchBar = UISearchBar()
+    //        searchBar.placeholder = "search for contacts"
+    //
+    //        return searchBar
+    //    }()
     let searchController = UISearchController(searchResultsController: nil)
     
     private let noResultLabel: UILabel = {
@@ -45,11 +46,7 @@ class NewMessageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(noResultLabel)
-        
         view.backgroundColor = .lightGray
-        
-       // searchBar.delegate = self
-        //searchBar.becomeFirstResponder()
         configureSearchBar()
         configureCollectionView()
         fetchAllUser()
@@ -71,9 +68,8 @@ class NewMessageViewController: UIViewController {
     }
     
     func fetchAllUser() {
-        DatabaseManager.shared.getAllUsers(uid: uid) { users in
+        DatabaseManager.shared.getAllUsers() { users in
             self.users = users
-            self.results = users
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
@@ -81,9 +77,7 @@ class NewMessageViewController: UIViewController {
     }
     
     func configureSearchBar(){
-//        navigationController?.navigationBar.topItem?.titleView = searchBar
-       navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(didTapCancel))
-//        searchBar.becomeFirstResponder()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(didTapCancel))
         searchController.loadViewIfNeeded()
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
@@ -105,72 +99,67 @@ class NewMessageViewController: UIViewController {
 
 extension NewMessageViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let count = searching ? results.count : users.count
-            return count
+        return inSearchMode ? searchUsers.count : users.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "conversationCell", for: indexPath) as! CollectionViewCell
+        let user = inSearchMode ? searchUsers[indexPath.row] : users[indexPath.row]
         
-        let user = searching ? results[indexPath.row] : users[indexPath.row]
-             //cell.text = user.email
-           cell.messageLabel.text = user.username
-           cell.timeLabel.isHidden = true
-          
-           // cell.selectButton.isHidden = true
-           let uid = user.uid
-           Storagemanager.shared.downloadImageWithPath(path: "Profile/\(uid)") { image in
-             cell.imageView.image = image
-           }
-
+        cell.nameLabel.text = user.email
+        cell.messageLabel.text = user.username
+        cell.timeLabel.isHidden = true
+        //cell.selectButton.isHidden = true
+        
+        let uid = user.uid
+        
+        Storagemanager.shared.downloadImageWithPath(path: "Profile/\(uid)") { image in
+            cell.imageView.image = image
+        }
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("selectttttttttttttt")
-        let selectedUser = searching ? results[indexPath.row] : users[indexPath.row]
+        let selectedUser = users[indexPath.row]
+        let users: [UserData] = [currentUser!, selectedUser]
+        
         let id = "\(currentUser!.uid)_\(selectedUser.uid)"
-                let chatVC = ChatViewController()
-            for chat in conversations {
-               var currentChat = chat
-               let uid1 = chat.users[0].uid
-               let uid2 = chat.users[1].uid
-               if uid1 == currentUser!.uid && uid2 == selectedUser.uid || uid1 == selectedUser.uid && uid2 == currentUser!.uid {
-                currentChat.otherUserIndex = uid1 == currentUser!.uid ? 1 : 0
+        let chatVC = ChatViewController()
+        var vcArray = navigationController?.viewControllers
+        vcArray?.removeLast()
+        
+        for chat in chats {
+            var currentChat = chat
+            let uid1 = chat.users[0].uid
+            let uid2 = chat.users[1].uid
+            
+            if uid1 == currentUser!.uid && uid2 == selectedUser.uid || uid1 == selectedUser.uid && uid2 == currentUser!.uid {
+                print("Already Chated")
+                
+                currentChat.otherUser =  uid1 == currentUser!.uid ? 1 : 0
                 chatVC.chat = currentChat
-                chatVC.chatId = id
-                 chatVC.title = selectedUser.username
-                navigationController?.pushViewController(chatVC, animated: true)
+                
+                vcArray?.append(chatVC)
+                navigationController?.setViewControllers(vcArray!, animated: true)
+                
                 return
-               }
-              }
-            DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
-            present(chatVC, animated: true, completion: nil)
-              }
-          }
-//        let selectedUser = results[indexPath.row]
-//        let users: [User] = [currentUser!, selectedUser]
-//        let id = "\(currentUser!.uid)_\(selectedUser.uid)"
-//        let chatVC = ChatViewController()
-//        for chat in conversations {
-//                      var currentChat = chat
-//                      let uid1 = chat.users[0].uid
-//                      let uid2 = chat.users[1].uid
-//                      if uid1 == currentUser!.uid && uid2 == selectedUser.uid || uid1 == selectedUser.uid && uid2 == currentUser!.uid {
-//                        print("Already Chated")
-//                        currentChat.otherUserIndex = uid1 == currentUser!.uid ? 1 : 0
-//                        chatVC.chat = currentChat
-//                          chatVC.title = selectedUser.username
-//                        navigationController?.pushViewController(chatVC, animated: true)
-//                        return
-//                      }
-//                    }
-//        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id )
-//        chatVC.chat = ChatModel(users: users, lastMessage: nil, messagesArray: [], otherUserIndex: 1, chatId: id)
-//        self.present(chatVC, animated: true, completion: nil)
-  
-    
-
+            }
+            
+        }
+        print("New Chat")
+        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
+        
+        chatVC.chat = Chats(chatId: id, users: users, lastMessage: nil, messages: [], otherUser: 1)
+        
+        vcArray?.append(chatVC)
+        navigationController?.setViewControllers(vcArray!, animated: true)
+        //        navigationController?.popViewController(animated: false)
+        //        navigationController?.pushViewController(chatVC, animated: true)
+        
+    }
+}
 
 
 extension NewMessageViewController: UICollectionViewDelegateFlowLayout {
@@ -188,50 +177,22 @@ extension NewMessageViewController: UICollectionViewDelegateFlowLayout {
 }
 
 extension NewMessageViewController:UISearchResultsUpdating,UISearchBarDelegate{
-  func updateSearchResults(for searchController: UISearchController) {
-    let count = searchController.searchBar.text?.count
-    let searchText = searchController.searchBar.text!
-    if !searchText.isEmpty {
-      searching = true
-      results.removeAll()
-      results = users.filter({$0.username.prefix(count!).lowercased() == searchText.lowercased()})
-        noResultLabel.isHidden = false
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchText = searchController.searchBar.text!
+        if inSearchMode {
+            searchUsers.removeAll()
+            
+            for user in users {
+                if user.username.lowercased().contains(searchText.lowercased()) || user.email.lowercased().contains(searchText.lowercased()) {
+                    searchUsers.append(user)
+                }
+            }
+        }
+        collectionView.reloadData()
     }
-    else{
-      searching = false
-      results = users
-        
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        collectionView.reloadData()
     }
-    collectionView.reloadData()
-  }
-  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    searching = false
-    results = users
-    collectionView.reloadData()
-  }
-
-
-//    func filterUsers(term:String) {
-//        guard hasFetched else {
-//            return
-//        }
-//        print(self.users)
-//        self.results = self.users.filter({$0.username.lowercased() == term.lowercased()
-//
-//        })
-//        print(results)
-//        updateUI()
-//    }
-//
-//    func updateUI(){
-//        if results.isEmpty {
-//            self.collectionView.isHidden = true
-//            self.noResultLabel.isHidden = false
-//        }else{
-//            self.collectionView.isHidden = false
-//            self.noResultLabel.isHidden = true
-//        }
-//        self.collectionView.reloadData()
-//    }
 }
 

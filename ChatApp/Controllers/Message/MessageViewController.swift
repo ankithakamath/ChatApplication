@@ -12,10 +12,13 @@ import SwiftUI
 
 class MessageViewController: UIViewController {
     
-    var currentUser:User?
-    var tapped :Bool = false
-    var conversations: [ChatModel] = []
+    var chats: [Chats] = []
+    var currentUser: UserData?
     var collectionView: UICollectionView!
+    var uid : String!
+    var lastMessageItem: Message?
+    
+    
     
     private let noMessageLabel: UILabel = {
         let label = UILabel()
@@ -27,43 +30,31 @@ class MessageViewController: UIViewController {
         return label
     }()
     
-    //    private let tableView: UITableView = {
-    //        let table = UITableView()
-    //        table.isHidden = true
-    //        table.backgroundColor = .lightGray
-    //        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-    //        return table
-    //
-    //    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureCollectionView()
-        view.backgroundColor = .lightGray
+        
+        view.backgroundColor = .white
         title = "chats"
-        configureNavBar()
-       
+        validateAuth()
     }
     
     @objc func didTapEdit() {
-        tapped = !tapped
-        collectionView.reloadData()
     }
+    
     
     func configureNavBar(){
         navigationController?.navigationBar.barTintColor = UIColor.green
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapCompose))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(didTapEdit))
-        // view.addSubview(tableView)
         view.addSubview(noMessageLabel)
-        //setupTableView()
         
     }
     
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        //tableView.frame = view.bounds
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -74,16 +65,13 @@ class MessageViewController: UIViewController {
     
     @objc func didTapCompose(){
         let vc = NewMessageViewController()
-        let navVC  = UINavigationController(rootViewController: vc)
-        vc.conversations = conversations
         vc.currentUser = currentUser
-        present(navVC,animated: true)
+        vc.chats = chats
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+        
     }
     
-    //    private func setupTableView(){
-    //        tableView.delegate = self
-    //        tableView.dataSource = self
-    //    }
     
     func validateAuth(){
         if FirebaseAuth.Auth.auth().currentUser == nil {
@@ -94,27 +82,29 @@ class MessageViewController: UIViewController {
                 self.present(nav,animated: false)
             }
         }else{
-            //configureNavigationBar()
+            configureNavBar()
+            fetchUserData()
             configureCollectionView()
-            fetchAllUser()
+            
+            
             
         }
     }
     
-    func fetchAllUser() {
-        let uid = Auth.auth().currentUser?.uid
+    func fetchUserData() {
+        chats = []
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:a"
         
-        DatabaseManager.shared.getUser(uid:uid!) { currentUser in
+        DatabaseManager.shared.getUser(uid: DatabaseManager.shared.getUID()!) { currentUser in
             self.currentUser = currentUser
         }
-        
-        DatabaseManager.shared.fetchChats(uid: uid!) { conversation in
-            self.conversations = conversation
+        DatabaseManager.shared.fetchChats(uid: DatabaseManager.shared.getUID()!) { chats in
+            self.chats = chats
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
         }
-        
     }
     
     
@@ -130,42 +120,28 @@ class MessageViewController: UIViewController {
     }
     
 }
+
 extension MessageViewController: UICollectionViewDelegate,UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "conversationCell" , for: indexPath) as! CollectionViewCell
-        let chat = conversations[indexPath.row]
-        let otherUser = chat.users[chat.otherUserIndex!]
-        cell.nameLabel.text = otherUser.username
-        cell.messageLabel.text = chat.lastMessage?.message
-        cell.backgroundColor = .white
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "hh:mm:a"
-        
-        if chat.lastMessage == nil {
-            cell.timeLabel.isHidden = true
-        } else {
-            cell.timeLabel.isHidden = false
-            cell.timeLabel.text = dateFormatter.string(from: chat.lastMessage!.time)
-        }
-        Storagemanager.shared.downloadImageWithPath(path: "Profile/\(otherUser.uid)") { image in
-            cell.imageView.image = image
-        }
+        let chat = chats[indexPath.row]
+        cell.messageLabel.text = chat.lastMessage?.content
+        cell.chat = chat
         return cell
     }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return conversations.count
+        return chats.count
     }
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("selectttttttttttttt")
-        let user = conversations[indexPath.row]
         let Cvc = ChatViewController()
-        Cvc.currentUser = currentUser
-        Cvc.chat = user
+        Cvc.chat = chats[indexPath.row]
+        Cvc.hidesBottomBarWhenPushed = true
         Cvc.navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.pushViewController(Cvc, animated: true)
     }
@@ -194,26 +170,3 @@ extension MessageViewController: UICollectionViewDelegateFlowLayout{
     
 }
 
-//extension MessageViewController: UITableViewDelegate,UITableViewDataSource{
-//
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return 1
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "cell",for: indexPath)
-//        cell.textLabel?.text = "Hello there"
-//        cell.accessoryType = .disclosureIndicator
-//        return cell
-//    }
-//
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        tableView.deselectRow(at: indexPath, animated: true)
-//
-//        let Cvc = ChatViewController()
-//        Cvc.title = "jenny smith"
-//        Cvc.navigationItem.largeTitleDisplayMode = .never
-//        self.navigationController?.pushViewController(Cvc, animated: true)
-//        print ("-------------")
-//    }
-//}

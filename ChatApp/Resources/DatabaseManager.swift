@@ -24,13 +24,9 @@ final class DatabaseManager {
         return formatter
     }()
     
-    static func safeEmail(emailAddress: String) -> String {
-        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
-        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
-        return safeEmail
+    func addUser(user: UserData) {
+        database.child("Users").child(user.uid).setValue(user.dictionary)
     }
-    
-    
     
     
     
@@ -46,7 +42,10 @@ final class DatabaseManager {
         })
     }
     
-    func getUser(uid: String, completion: @escaping(User) -> Void) {
+    
+    
+    
+    func getUser(uid: String, completion: @escaping(UserData) -> Void) {
         database.child("Users").child(uid).observe(.value) { snapshot in
             if let dictionary = snapshot.value as? [String: Any] {
                 
@@ -55,16 +54,18 @@ final class DatabaseManager {
                 let profileURL = dictionary["profileURL"] as! String
                 let uid = dictionary["uid"] as! String
                 
-                let user = User(username: username, email: email, profileURL: profileURL, uid: uid)
+                let user = UserData(username: username, email: email, profileURL: profileURL, uid: uid)
                 completion(user)
             }
         }
     }
     
-    func getAllUsers(uid: String, completion: @escaping([User]) -> Void) {
+    func getAllUsers(completion: @escaping([UserData]) -> Void) {
         print("useruseruseruseruser")
         
-        var users = [User]()
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        var users = [UserData]()
         
         database.child("Users").observe(.value) { snapshot in
             if let result = snapshot.value as? [String: Any] {
@@ -79,7 +80,7 @@ final class DatabaseManager {
                     let username = userData["username"] as! String
                     let uid = userData["uid"] as! String
                     let profileURL = userData["profileURL"] as! String
-                    let user = User(username: username, email: email, profileURL: profileURL, uid: uid)
+                    let user = UserData(username: username, email: email, profileURL: profileURL, uid: uid)
                     users.append(user)
                 }
                 completion(users)
@@ -88,8 +89,15 @@ final class DatabaseManager {
         
     }
     
-    
-    
+    func addChat(user1: UserData, user2: UserData, id: String) {
+        var userDictionary: [[String: Any]] = []
+        
+        userDictionary.append(user1.dictionary)
+        userDictionary.append(user2.dictionary)
+        let finalDic = ["users" : userDictionary]
+        
+        database.child("Chats").child(id).setValue(finalDic)
+    }
     
     public enum DatabaseError: Error {
         case failedToFetch
@@ -104,105 +112,92 @@ final class DatabaseManager {
             return false
         }
     }
+
     
-    func addMessage(chat: ChatModel, id: String, messageContent:[MessageModel]) {
+    func addMessage(messages: [Message], lastMessage: Message, id: String) {
+        var lastMessageItem = lastMessage
+               
+               let dateString = databaseDateFormatter.string(from: lastMessageItem.time)
+               lastMessageItem.dateString = dateString
+               
+               let lastMessageDictionary = lastMessageItem.dictionary
+               var messagesDictionary: [[String: Any]] = []
+               
+               for var message in messages {
+                   let dateString = databaseDateFormatter.string(from: message.time)
+                   message.dateString = dateString
+                   messagesDictionary.append(message.dictionary)
+               }
+               let finalDictionary = ["lastMessage": lastMessageDictionary]
+               database.child("Chats").child(id).updateChildValues(finalDictionary)
+               database.child("Chats").child(id).child("messages").childByAutoId().setValue(lastMessageDictionary)
+           }
+           
+          
+    
+    
+    
+    
+    func fetchMessages(chatId: String, completion: @escaping([Message]) -> Void) {
+        database.child("Chats").child("\(chatId)/messages").observe(.value) { [self] snapshot in
+                  var resultArray: [Message] = []
+                  print("Messages\(snapshot.value)")
+                  if let result = snapshot.value as? [String: [String: Any]] {
+                      let sortedKeyArray = result.keys.sorted()
+                      for id in sortedKeyArray {
+      
+                          let message = result[id]!
+                          resultArray.append(createMessageObject(dictionary: message , id: id))
+                      }
+                      
+                      completion(resultArray)
+                  }
+              }
+          }
+    
+    func createMessageObject(dictionary: [String: Any],id: String) -> Message{
         
-        var currentChat = chat
+        let sender = dictionary["sender"] as! String
+        let content = dictionary["content"] as! String
+        let timeString = dictionary["time"] as! String
+        let seen = dictionary["seen"] as! Bool
         
-        let dateString = databaseDateFormatter.string(from: currentChat.lastMessage!.time)
-        currentChat.lastMessage?.dateString = dateString
+        let time = databaseDateFormatter.date(from: timeString)
         
-        let lastMessageDictionary = currentChat.lastMessage?.dictionary
-        var messagesDictionary: [[String: Any]] = []
-        
-        for var message in messageContent {
-            let dateString = databaseDateFormatter.string(from: message.time)
-            message.dateString = dateString
-            messagesDictionary.append(message.dictionary)
-        }
-        
-        let finalDictionary = ["lastMessage": lastMessageDictionary!,
-                               "messagesArray": messagesDictionary] as [String : Any]
-        
-        database.child("Chats").child(id).updateChildValues(finalDictionary)
+        return Message(sender: sender, content: content, time: time!, seen: seen, id: id)
     }
     
+    func getUID() -> String? {
+           return Auth.auth().currentUser?.uid
+       }
     
-    func addUser(user: User) {
-        database.child("Users").child(user.uid).setValue(user.dictionary)
-    }
     
-    func fetchMessages(chatId: String, completion: @escaping([MessageModel]) -> Void) {
-        database.child("Chats").child("\(chatId)/messagesArray").observe(.value) { [self] snapshot in
-            var resultArray: [MessageModel] = []
-            
-            if let result = snapshot.value as? [[String: Any]] {
-                //
-                for message in result {
-                    //
-                    let sender = message["sender"] as! String
-                    let messageContent = message["message"] as! String
-                    let timeString = message["time"] as! String
-                    
-                    let time = databaseDateFormatter.date(from: timeString)
-                    resultArray.append(MessageModel(sender: sender, message: messageContent, time: time!))
-                }
-                
-                completion(resultArray)
-            }
-        }
-    }
-    
-    func addChat(user1: User, user2: User, id: String) {
-        var userDictionary: [[String: Any]] = []
+    func fetchChats(uid: String, completion: @escaping([Chats]) -> Void) {
         
-        userDictionary.append(user1.dictionary)
-        userDictionary.append(user2.dictionary)
-        let finalDic = ["users" : userDictionary]
-        
-        database.child("Chats").child(id).setValue(finalDic)
-    }
-    
-    
-    func fetchChats(uid: String, completion: @escaping([ChatModel]) -> Void) {
-        
-        database.child("Chats").observe(.value) { [self] snapshot in
-            var chats = [ChatModel]()
-            print("---------------------------")
+        database.child("Chats").observe(.value) { snapshot in
+            var chats = [Chats]()
             if let result = snapshot.value as? [String: [String: Any]] {
-                //                print(result)
+                
                 for key in result.keys {
-                    //                   print(key)
+                    //                   print(keys)
                     let value = result[key]!
-                    var messagesArray: [MessageModel] = []
-                    var lastMessage: MessageModel?
+                    var messagesArray: [Message] = []
+                    var lastMessage: Message?
                     
                     let users = value["users"] as! [[String: Any]]
-                    let lastMessageArray = value["lastMessage"] as? [String: Any]
-                    let messageArray = value["messagesArray"] as? [[String: Any]]
+                    let lastMessageDictionary = value["lastMessage"] as? [String: Any]
+                    let messagesDictionary = value["messages"] as? [[String: Any]]
                     //                    print(users)
-                    if lastMessageArray != nil {
-                        for messageItem in messageArray! {
-                            let sender = messageItem["sender"] as! String
-                            let message = messageItem["message"] as! String
-                            let timeString = messageItem["time"] as! String
-                         
-                            
-                            let time = databaseDateFormatter.date(from: timeString)
-                            
-                            let currentMessage = MessageModel(sender: sender, message: message, time: time!)
-                            
-                            messagesArray.append(currentMessage)
-                        }
+                    if lastMessageDictionary != nil {
                         
-                        let sender = lastMessageArray!["sender"] as! String
-                        let message = lastMessageArray!["message"] as! String
-                        let timeString = lastMessageArray!["time"] as! String
-                      
+                        let sender = lastMessageDictionary!["sender"] as! String
+                        let content = lastMessageDictionary!["content"] as? String
+                        let timeString = lastMessageDictionary!["time"] as! String
+                        let seen = lastMessageDictionary!["seen"] as? Bool
+                     
+                        let time = self.databaseDateFormatter.date(from: timeString)
                         
-                        let time = databaseDateFormatter.date(from: timeString)
-                        
-                        lastMessage = MessageModel(sender: sender, message:message, time: time!)
+                        lastMessage = Message(sender: sender, content: content!, time: time!, seen: seen!)
                         
                     } else {
                         messagesArray = []
@@ -217,14 +212,14 @@ final class DatabaseManager {
                     let uid1 = user1["uid"] as! String
                     let profileURL1 = user1["profileURL"] as! String
                     
-                    let firstUser = User(username: username1, email: email1, profileURL: profileURL1, uid: uid1)
+                    let firstUser = UserData(username: username1, email: email1, profileURL: profileURL1, uid: uid1)
                     
                     let email2 = user2["email"] as! String
                     let username2 = user2["username"] as! String
                     let uid2 = user2["uid"] as! String
                     let profileURL2 = user2["profileURL"] as! String
                     
-                    let secondUser = User(username: username2, email: email2, profileURL: profileURL2, uid: uid2)
+                    let secondUser = UserData(username: username2, email: email2, profileURL: profileURL2, uid: uid2)
                     
                     var otherUser: Int
                     
@@ -234,67 +229,17 @@ final class DatabaseManager {
                         otherUser = 0
                     }
                     let id = key
-                    let chat = ChatModel(users: [firstUser, secondUser], lastMessage: lastMessage, messagesArray: messagesArray, otherUserIndex: otherUser,chatId: id)
+                    
+                    let chat = Chats(chatId: id, users: [firstUser, secondUser], lastMessage: lastMessage, messages: [], otherUser: otherUser)
                     
                     if firstUser.uid == uid || secondUser.uid == uid {
                         chats.append(chat)
                     }
-                    
-                    print(chat)
-                    
                 }
-                completion(chats)
+                let sortedChats = chats.sorted()
+                completion(sortedChats)
             }
         }
     }
-    
-    func createMessageObject(dictionary: [String: Any]) -> MessageModel {
-        let sender = dictionary["sender"] as! String
-        let message = dictionary["message"] as! String
-        let timeString = dictionary["time"] as! String
-        
-        let time = databaseDateFormatter.date(from: timeString)
-        
-        return MessageModel(sender: sender, message: message, time: time!)
-    }
+ 
 }
-
-
-
-
-
-struct User: Codable {
-    
-    var username: String
-    var email: String
-    var profileURL: String
-    var uid: String
-    
-    var dictionary: [String: Any] {
-        return [
-            "username": username,
-            "email": email,
-            "profileURL": profileURL,
-            "uid": uid
-        ]
-    }
-}
-
-//struct ChatAppUser {
-//    let firstName: String
-//    let lastName: String
-//    let emailAddress: String
-//
-//    var safeEmail: String {
-//        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
-//        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
-//        return safeEmail
-//
-//    }
-//
-//    var profilePictureFileName: String {
-//        //ankitha99-gmail-com_profile_picture.png
-//        return "\(safeEmail)_profile_picture.png"
-//    }
-//
-//}

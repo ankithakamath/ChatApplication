@@ -28,13 +28,13 @@ class RegisterViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "person.circle")
         imageView.tintColor = .white
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.borderWidth = 5
         imageView.layer.borderColor = UIColor.lightGray.cgColor
-        
-        
-        imageView.heightAnchor.constraint(equalToConstant: 250).isActive = true
-        //        imageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        imageView.layer.cornerRadius = 50
+        imageView.clipsToBounds = true
+        imageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         return imageView
@@ -92,18 +92,17 @@ class RegisterViewController: UIViewController {
             }
             FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
                 guard authResult != nil, error == nil else {
-                    self?.showAlert(title: "ERROR", messageContent: "erroe in creating user")
+                    self?.showAlert(title: "ERROR", messageContent: "error in creating user")
                     return
                 }
                 let uid = authResult?.user.uid
                 
                 Storagemanager.ImageUploader.uploadImage(image: profilePic!, uid: uid!) { url in
-                    let newUser = User(username: firstName + lastName, email: email, profileURL: url, uid: uid!)
+                    let newUser = UserData(username: firstName, email: email, profileURL: url, uid: uid!)
                     DatabaseManager.shared.addUser(user: newUser)
-                    // self?.delegate?.userAuthenticated()
                     self?.dismiss(animated: true)
                 }
-                self?.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+                self?.presentingViewController?.dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -140,23 +139,24 @@ class RegisterViewController: UIViewController {
     }
     
     func configureUI() {
-        let stack = UIStackView(arrangedSubviews: [ photoButton,firstNameContainer,lastNameContainer,usernameContainer,passwordContainer,signupButton])
+        
+        let stack = UIStackView(arrangedSubviews: [firstNameContainer,lastNameContainer,usernameContainer,passwordContainer,signupButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 10
         view.addSubview(stack)
-        
-        
-        stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        view.addSubview(photoButton)
+        photoButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        photoButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        stack.topAnchor.constraint(equalTo: photoButton.bottomAnchor, constant: 10).isActive = true
         stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-        photoButton.layer.cornerRadius = photoButton.frame.size.width/2
+        //photoButton.layer.cornerRadius = photoButton.frame.size.width/2
         //photoButton.layer.cornerRadius = 1
         //passwordTextField.isSecureTextEntry = true
         photoButton.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapChangeProfileImage))
         photoButton.addGestureRecognizer(gesture)
-        
         
         
     }
