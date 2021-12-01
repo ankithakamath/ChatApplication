@@ -152,7 +152,7 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //title = "Login"
-        view.backgroundColor = .white
+        view.backgroundColor = .lightGray
         configureUI()
     }
     

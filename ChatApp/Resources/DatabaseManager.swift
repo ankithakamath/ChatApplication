@@ -161,10 +161,10 @@ final class DatabaseManager {
         let content = dictionary["content"] as! String
         let timeString = dictionary["time"] as! String
         let seen = dictionary["seen"] as! Bool
-        
+        let imageChat = dictionary["imageChat"] as! String
         let time = databaseDateFormatter.date(from: timeString)
         
-        return Message(sender: sender, content: content, time: time!, seen: seen, id: id)
+        return Message(sender: sender, content: content, time: time!, seen: seen, imageChat: imageChat,id: id)
     }
     
     func getUID() -> String? {
