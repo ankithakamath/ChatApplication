@@ -112,48 +112,48 @@ final class DatabaseManager {
             return false
         }
     }
-
+    
     
     func addMessage(messages: [Message], lastMessage: Message, id: String) {
         var lastMessageItem = lastMessage
-               
-               let dateString = databaseDateFormatter.string(from: lastMessageItem.time)
-               lastMessageItem.dateString = dateString
-               
-               let lastMessageDictionary = lastMessageItem.dictionary
-               var messagesDictionary: [[String: Any]] = []
-               
-               for var message in messages {
-                   let dateString = databaseDateFormatter.string(from: message.time)
-                   message.dateString = dateString
-                   messagesDictionary.append(message.dictionary)
-               }
-               let finalDictionary = ["lastMessage": lastMessageDictionary]
-               database.child("Chats").child(id).updateChildValues(finalDictionary)
-               database.child("Chats").child(id).child("messages").childByAutoId().setValue(lastMessageDictionary)
-           }
-           
-          
+        
+        let dateString = databaseDateFormatter.string(from: lastMessageItem.time)
+        lastMessageItem.dateString = dateString
+        
+        let lastMessageDictionary = lastMessageItem.dictionary
+        var messagesDictionary: [[String: Any]] = []
+        
+        for var message in messages {
+            let dateString = databaseDateFormatter.string(from: message.time)
+            message.dateString = dateString
+            messagesDictionary.append(message.dictionary)
+        }
+        let finalDictionary = ["lastMessage": lastMessageDictionary]
+        database.child("Chats").child(id).updateChildValues(finalDictionary)
+        database.child("Chats").child(id).child("messages").childByAutoId().setValue(lastMessageDictionary)
+    }
+    
+    
     
     
     
     
     func fetchMessages(chatId: String, completion: @escaping([Message]) -> Void) {
         database.child("Chats").child("\(chatId)/messages").observe(.value) { [self] snapshot in
-                  var resultArray: [Message] = []
-                  print("Messages\(snapshot.value)")
-                  if let result = snapshot.value as? [String: [String: Any]] {
-                      let sortedKeyArray = result.keys.sorted()
-                      for id in sortedKeyArray {
-      
-                          let message = result[id]!
-                          resultArray.append(createMessageObject(dictionary: message , id: id))
-                      }
-                      
-                      completion(resultArray)
-                  }
-              }
-          }
+            var resultArray: [Message] = []
+            print("Messages\(snapshot.value)")
+            if let result = snapshot.value as? [String: [String: Any]] {
+                let sortedKeyArray = result.keys.sorted()
+                for id in sortedKeyArray {
+                    
+                    let message = result[id]!
+                    resultArray.append(createMessageObject(dictionary: message , id: id))
+                }
+                
+                completion(resultArray)
+            }
+        }
+    }
     
     func createMessageObject(dictionary: [String: Any],id: String) -> Message{
         
@@ -168,8 +168,8 @@ final class DatabaseManager {
     }
     
     func getUID() -> String? {
-           return Auth.auth().currentUser?.uid
-       }
+        return Auth.auth().currentUser?.uid
+    }
     
     
     func fetchChats(uid: String, completion: @escaping([Chats]) -> Void) {
@@ -194,7 +194,7 @@ final class DatabaseManager {
                         let content = lastMessageDictionary!["content"] as? String
                         let timeString = lastMessageDictionary!["time"] as! String
                         let seen = lastMessageDictionary!["seen"] as? Bool
-                     
+                        
                         let time = self.databaseDateFormatter.date(from: timeString)
                         
                         lastMessage = Message(sender: sender, content: content!, time: time!, seen: seen!)
@@ -241,5 +241,5 @@ final class DatabaseManager {
             }
         }
     }
- 
+    
 }

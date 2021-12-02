@@ -96,6 +96,8 @@ class CollectionViewCell: UICollectionViewCell {
         }
     
     func configure(){
+        layer.borderWidth = 2
+        layer.borderColor = UIColor.gray.cgColor
         backgroundColor = .systemBackground
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
