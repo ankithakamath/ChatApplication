@@ -54,11 +54,7 @@ class MessageCell: UITableViewCell {
         messageContainer.translatesAutoresizingMaskIntoConstraints = false
         return messageContainer
     }()
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-//        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
-    }
+
     
     let chatImage: UIImageView = {
         let chatimage = UIImageView()
@@ -83,42 +79,50 @@ class MessageCell: UITableViewCell {
     
     
     func configure(isSender: Bool){
-        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 10)
-        rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -10)
-        leftConstraint?.priority = UILayoutPriority(999)
-        rightConstraint?.priority = UILayoutPriority(999)
+        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 5)
+        rightConstraint =  messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -5)
         
         messageContent.text = messageItem?.content
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:a"
-        messageContent.text = messageItem!.content
         time.text = dateFormatter.string(from: messageItem!.time)
         addSubview(messageContainer)
         messageContainer.addSubview(messageContent)
         messageContainer.addSubview(time)
+        
         if isSender{
             leftConstraint?.isActive =  false
             rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemGreen
+            messageContainer.backgroundColor = .systemMint
         }else{
             leftConstraint?.isActive =  true
             rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray
+            messageContainer.backgroundColor = .systemGray2
             
         }
 
         NSLayoutConstraint.activate([
-            messageContainer.widthAnchor.constraint(equalToConstant: 210),
-        messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
-           messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 0),
-            
-            messageContent.leftAnchor.constraint(equalTo:messageContainer.leftAnchor,constant: 10),
-            messageContent.topAnchor.constraint(equalTo:messageContainer.topAnchor,constant: 10),
-            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
+            messageContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
+            messageContainer.topAnchor.constraint(equalTo: topAnchor, constant: 5),
+            messageContainer.widthAnchor.constraint(equalToConstant: 250),
+           
+            messageContent.topAnchor.constraint(equalTo: messageContainer.topAnchor, constant: 5),
+            messageContent.leftAnchor.constraint(equalTo: messageContainer.leftAnchor, constant: 5),
             time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
-            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
-            time.widthAnchor.constraint(equalToConstant: 80),
-            messageContent.rightAnchor.constraint(equalTo:time.leftAnchor,constant:-10),
+            time.rightAnchor.constraint(equalTo: messageContainer.rightAnchor),
+            time.leftAnchor.constraint(equalTo: messageContent.rightAnchor),
+            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor)
+//            messageContainer.widthAnchor.constraint(equalToConstant: 220),
+//            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
+//            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 5),
+//
+//            messageContent.leftAnchor.constraint(equalTo:messageContainer.leftAnchor,constant: 10),
+//            messageContent.topAnchor.constraint(equalTo:messageContainer.topAnchor,constant: 10),
+//            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
+//            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
+//            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
+//            time.widthAnchor.constraint(equalToConstant: 80),
+//            messageContent.rightAnchor.constraint(equalTo:time.leftAnchor,constant:-10),
         ])
     }
     
@@ -129,38 +133,47 @@ class MessageCell: UITableViewCell {
                 self.chatImage.image = image
             }
         })
-        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 10)
-        rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -10)
-        addSubview(messageContainer)
+        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 5)
+        rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -5)
+        
         messageContent.text = messageItem?.content
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:a"
         time.text = dateFormatter.string(from: messageItem!.time)
-        messageContainer.addSubview(messageContent)
+        addSubview(messageContainer)
         messageContainer.addSubview(chatImage)
         messageContainer.addSubview(time)
         if isSender{
             leftConstraint?.isActive =  false
             rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemGreen
+            messageContainer.backgroundColor = .systemMint
         }else{
             leftConstraint?.isActive =  true
             rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray
+            messageContainer.backgroundColor = .systemGray2
         }
         NSLayoutConstraint.activate([
+            
+            messageContainer.topAnchor.constraint(equalTo: topAnchor, constant: 5),
+            messageContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
             messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor, constant: 10),
-            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
-            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 0),
-            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor,constant: 5),
-            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor, constant: 0),
-            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
-            time.topAnchor.constraint(equalTo: chatImage.bottomAnchor),
-            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
-            time.widthAnchor.constraint(equalToConstant: 80)
+            messageContainer.heightAnchor.constraint(equalTo: chatImage.heightAnchor, constant: 40 ),
+            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor, constant: 5),
+            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor),
+            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor),
+            time.rightAnchor.constraint(equalTo: messageContainer.rightAnchor)
+            
+//            messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor),
+//            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 10),
+//            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor),
+//            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor,constant: 5),
+//            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor),
+//            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
+//            time.topAnchor.constraint(equalTo: chatImage.bottomAnchor),
+//            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
+//            time.widthAnchor.constraint(equalToConstant: 80)
             
         ])
-        
         
     }
     

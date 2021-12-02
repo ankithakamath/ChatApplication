@@ -183,7 +183,7 @@ class ChatViewController:UITableViewController {
             textField1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
             textField1.heightAnchor.constraint(equalToConstant: 50),
             textField1.rightAnchor.constraint(equalTo: addimageButton.leftAnchor, constant: 0),
-            textField1.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -120),
+            textField1.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -105),
             addimageButton.leftAnchor.constraint(equalTo: textField1.rightAnchor),
             addimageButton.widthAnchor.constraint(equalToConstant: 50),
             addimageButton.heightAnchor.constraint(equalToConstant: 50),
@@ -215,8 +215,11 @@ class ChatViewController:UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
     }
+    
+//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return 50
+//    }
     
 }
 
@@ -224,6 +227,7 @@ extension ChatViewController: UIImagePickerControllerDelegate, UINavigationContr
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let imageSelected = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
             uploadPhoto(image: imageSelected)
+         
         }
         
         dismiss(animated: true, completion: nil)

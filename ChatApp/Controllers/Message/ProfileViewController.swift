@@ -33,12 +33,23 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         tableView.dataSource = self
         tableView.tableHeaderView = createTableHeader()
         fetchUser()
+        configurenavbar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tableView.tableHeaderView = createTableHeader()
         fetchUser()
+    }
+    
+    func configurenavbar(){
+        let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.backgroundColor = .systemMint
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.compactAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
     func createTableHeader() -> UIView? {
