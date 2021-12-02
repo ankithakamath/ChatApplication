@@ -33,8 +33,8 @@ class MessageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .white
+        navigationController?.navigationBar.barTintColor = UIColor.gray
+        //view.backgroundColor = .lightGray
         title = "chats"
         validateAuth()
     }
@@ -44,7 +44,13 @@ class MessageViewController: UIViewController {
     
     
     func configureNavBar(){
-        navigationController?.navigationBar.barTintColor = UIColor.green
+        let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.backgroundColor = .systemMint
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.compactAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapCompose))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(didTapEdit))
         view.addSubview(noMessageLabel)
@@ -113,7 +119,9 @@ class MessageViewController: UIViewController {
     func configureCollectionView(){
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
-        collectionView.backgroundColor = .lightGray
+       // collectionView.backgroundColor = .white
+        //collectionView.layer.borderColor = UIColor.lightGray.cgColor
+        //collectionView.layer.borderWidth = 2
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "conversationCell")

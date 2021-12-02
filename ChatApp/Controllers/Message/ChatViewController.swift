@@ -30,12 +30,11 @@ class ChatViewController:UITableViewController {
         
     }
     func configureTableView() {
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
-        tableView.bottomAnchor.constraint(equalTo:view.bottomAnchor,constant: 100 ).isActive = true
-        tableView.delegate =  self
-        tableView.dataSource = self
+//        tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+//        tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+//        tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
+//        tableView.bottomAnchor.constraint(equalTo:view.bottomAnchor,constant: -100 ).isActive = true
+        tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 100, right: 0)
         tableView.separatorStyle = .none
         tableView.register(MessageCell.self, forCellReuseIdentifier: "messageCell")
     }
@@ -46,7 +45,7 @@ class ChatViewController:UITableViewController {
         let sendButton = UIButton()
         sendButton.backgroundColor = .white
         sendButton.tintColor = .blue
-        sendButton.setImage(UIImage(systemName: "paperplane.circle"), for: .normal)
+        sendButton.setImage(UIImage(systemName: "paperplane.circle.fill"), for: .normal)
         sendButton.contentVerticalAlignment = .fill
         sendButton.contentHorizontalAlignment = .fill
         
@@ -59,7 +58,7 @@ class ChatViewController:UITableViewController {
         let addimageButton = UIButton()
         addimageButton.backgroundColor = .white
         addimageButton.tintColor = .blue
-        addimageButton.setImage(UIImage(systemName: "paperclip"), for: .normal)
+        addimageButton.setImage(UIImage(systemName: "camera.circle.fill"), for: .normal)
         addimageButton.contentVerticalAlignment = .fill
         addimageButton.contentHorizontalAlignment = .fill
         addimageButton.addTarget(self, action: #selector(sendImageChat), for: .touchUpInside)
@@ -105,7 +104,8 @@ class ChatViewController:UITableViewController {
             self.messages = messages
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.tableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
+                self.tableView.scrollToRow(at: [0, self.messages.count - 1], at: .bottom, animated: true)
+                
             }
         }
     }
@@ -182,17 +182,18 @@ class ChatViewController:UITableViewController {
             textField1.leftAnchor.constraint(equalTo:view.leftAnchor, constant: 5),
             textField1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
             textField1.heightAnchor.constraint(equalToConstant: 50),
+            textField1.rightAnchor.constraint(equalTo: addimageButton.leftAnchor, constant: 0),
             textField1.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -120),
-            addimageButton.leftAnchor.constraint(equalTo: textField1.rightAnchor, constant: -5),
+            addimageButton.leftAnchor.constraint(equalTo: textField1.rightAnchor),
             addimageButton.widthAnchor.constraint(equalToConstant: 50),
             addimageButton.heightAnchor.constraint(equalToConstant: 50),
             addimageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
-            sendButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5),
+            sendButton.rightAnchor.constraint(equalTo: view.rightAnchor),
             sendButton.heightAnchor.constraint(equalToConstant: 50),
             sendButton.leftAnchor.constraint(equalTo: addimageButton.rightAnchor, constant: 0),
             sendButton.widthAnchor.constraint(equalToConstant: 50),
             sendButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
-            textField1.rightAnchor.constraint(equalTo: addimageButton.leftAnchor, constant: -5)
+            textField1.rightAnchor.constraint(equalTo: addimageButton.leftAnchor, constant: 0)
         ])
         
         

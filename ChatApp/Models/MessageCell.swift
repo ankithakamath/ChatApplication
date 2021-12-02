@@ -17,21 +17,21 @@ class MessageCell: UITableViewCell {
     var rightConstraint :NSLayoutConstraint?
     let uid = Auth.auth().currentUser?.uid
     var messageItem: Message? {
-            didSet {
-                var isSender : Bool
-                guard let uid = DatabaseManager.shared.getUID() else { return }
-                if uid != messageItem?.sender {
-                    isSender = false
-                }else{
-                    isSender = true
-                }
-                if messageItem!.imageChat! == "" {
-                             configure(isSender: isSender)
-                         } else {
-                             configureChatImage(isSender: isSender)
-                         }
-                     }
-                 }
+        didSet {
+            var isSender : Bool
+            guard let uid = DatabaseManager.shared.getUID() else { return }
+            if uid != messageItem?.sender {
+                isSender = false
+            }else{
+                isSender = true
+            }
+            if messageItem!.imageChat! == "" {
+                configure(isSender: isSender)
+            } else {
+                configureChatImage(isSender: isSender)
+            }
+        }
+    }
     
     let messageContent :UILabel = {
         let message = UILabel()
@@ -55,16 +55,14 @@ class MessageCell: UITableViewCell {
         return messageContainer
     }()
     
-//    let chatContainer :UIView = {
-//        let chatContainer = UIView()
-//        chatContainer.backgroundColor = .systemGreen
-//        chatContainer.layer.cornerRadius = 10
-//        chatContainer.translatesAutoresizingMaskIntoConstraints = false
-//        return chatContainer
-//    }()
+    override func layoutSubviews() {
+        super.layoutSubviews()
+//        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+    }
     
     let chatImage: UIImageView = {
         let chatimage = UIImageView()
+       
         chatimage.heightAnchor.constraint(equalToConstant: 200).isActive = true
         chatimage.widthAnchor.constraint(equalToConstant: 200).isActive = true
         chatimage.clipsToBounds = true
@@ -87,7 +85,8 @@ class MessageCell: UITableViewCell {
     func configure(isSender: Bool){
         leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 10)
         rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -10)
-        
+        leftConstraint?.priority = UILayoutPriority(999)
+        rightConstraint?.priority = UILayoutPriority(999)
         
         messageContent.text = messageItem?.content
         let dateFormatter = DateFormatter()
@@ -97,39 +96,26 @@ class MessageCell: UITableViewCell {
         addSubview(messageContainer)
         messageContainer.addSubview(messageContent)
         messageContainer.addSubview(time)
-        
-//        if messageItem!.sender == uid  {
-//            leftConstraint?.isActive =  false
-//            rightConstraint?.isActive = true
-//            messageContainer.backgroundColor = .systemGreen
-//
-//        }
-//        else{
-//            leftConstraint?.isActive =  true
-//            rightConstraint?.isActive = false
-//            messageContainer.backgroundColor = .systemGray
-//            messageContent.backgroundColor = .systemGray
-//        }
         if isSender{
             leftConstraint?.isActive =  false
             rightConstraint?.isActive = true
             messageContainer.backgroundColor = .systemGreen
         }else{
-            leftConstraint?.isActive =  false
-            rightConstraint?.isActive = true
+            leftConstraint?.isActive =  true
+            rightConstraint?.isActive = false
             messageContainer.backgroundColor = .systemGray
             
         }
-//        messageContainer.backgroundColor = isSender ? .systemGreen : .systemGray
+
         NSLayoutConstraint.activate([
-            messageContainer.widthAnchor.constraint(equalToConstant: 300),
-            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
-            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: -5),
+            messageContainer.widthAnchor.constraint(equalToConstant: 210),
+        messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
+           messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 0),
             
             messageContent.leftAnchor.constraint(equalTo:messageContainer.leftAnchor,constant: 10),
             messageContent.topAnchor.constraint(equalTo:messageContainer.topAnchor,constant: 10),
             time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
-            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor, constant: 5),
+            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
             time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
             time.widthAnchor.constraint(equalToConstant: 80),
             messageContent.rightAnchor.constraint(equalTo:time.leftAnchor,constant:-10),
@@ -137,47 +123,45 @@ class MessageCell: UITableViewCell {
     }
     
     
-        func configureChatImage(isSender: Bool){
-            Storagemanager.shared.downloadImageWithPath(path: messageItem!.imageChat!, completion: { image in
-                       DispatchQueue.main.async {
-                           self.chatImage.image = image
-                       }
-                   })
-            leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 10)
-            rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -10)
-            addSubview(messageContainer)
-            messageContent.text = messageItem?.content
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "hh:mm:a"
-            messageContent.text = messageItem!.content
-            time.text = dateFormatter.string(from: messageItem!.time)
-            messageContainer.addSubview(messageContent)
-            messageContainer.addSubview(chatImage)
-            messageContainer.addSubview(time)
-            if isSender{
-                leftConstraint?.isActive =  false
-                rightConstraint?.isActive = true
-                messageContainer.backgroundColor = .systemGreen
-            }else{
-                leftConstraint?.isActive =  true
-                rightConstraint?.isActive = false
-                messageContainer.backgroundColor = .systemGray
+    func configureChatImage(isSender: Bool){
+        Storagemanager.shared.downloadImageWithPath(path: messageItem!.imageChat!, completion: { image in
+            DispatchQueue.main.async {
+                self.chatImage.image = image
             }
-            NSLayoutConstraint.activate([
-                messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor, constant: 10),
-                messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
-                messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: -5),
-                chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor,constant: 5),
-                chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor, constant: 0),
-                //time.centerXAnchor.constraint(equalTo: centerXAnchor),
-                time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
-                time.topAnchor.constraint(equalTo: chatImage.bottomAnchor, constant: 5),
-                time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: -5),
-                time.widthAnchor.constraint(equalToConstant: 80)
-                
-            ])
-            
-            
+        })
+        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 10)
+        rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -10)
+        addSubview(messageContainer)
+        messageContent.text = messageItem?.content
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:a"
+        time.text = dateFormatter.string(from: messageItem!.time)
+        messageContainer.addSubview(messageContent)
+        messageContainer.addSubview(chatImage)
+        messageContainer.addSubview(time)
+        if isSender{
+            leftConstraint?.isActive =  false
+            rightConstraint?.isActive = true
+            messageContainer.backgroundColor = .systemGreen
+        }else{
+            leftConstraint?.isActive =  true
+            rightConstraint?.isActive = false
+            messageContainer.backgroundColor = .systemGray
         }
+        NSLayoutConstraint.activate([
+            messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor, constant: 10),
+            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
+            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 0),
+            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor,constant: 5),
+            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor, constant: 0),
+            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
+            time.topAnchor.constraint(equalTo: chatImage.bottomAnchor),
+            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
+            time.widthAnchor.constraint(equalToConstant: 80)
+            
+        ])
+        
+        
+    }
     
 }
