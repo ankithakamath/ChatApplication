@@ -242,4 +242,13 @@ final class DatabaseManager {
         }
     }
     
+    func resetPassword(email: String, completion: @escaping(String) -> Void) {
+          Auth.auth().sendPasswordReset(withEmail: email) { error in
+              if let error = error {
+                  completion(error.localizedDescription)
+                  return
+              }
+              completion("Sent")
+          }
+      }
 }

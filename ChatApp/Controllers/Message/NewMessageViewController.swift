@@ -155,8 +155,7 @@ extension NewMessageViewController: UICollectionViewDataSource {
         
         vcArray?.append(chatVC)
         navigationController?.setViewControllers(vcArray!, animated: true)
-        //        navigationController?.popViewController(animated: false)
-        //        navigationController?.pushViewController(chatVC, animated: true)
+    
         
     }
 }

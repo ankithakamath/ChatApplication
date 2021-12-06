@@ -30,13 +30,11 @@ class ChatViewController:UITableViewController {
         
     }
     func configureTableView() {
-//        tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-//        tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-//        tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
-//        tableView.bottomAnchor.constraint(equalTo:view.bottomAnchor,constant: -100 ).isActive = true
+
         tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 100, right: 0)
         tableView.separatorStyle = .none
         tableView.register(MessageCell.self, forCellReuseIdentifier: "messageCell")
+        tableView.register(ImageCell.self, forCellReuseIdentifier: "imageCell")
     }
     
     let textField1 = CustomTextField(placeholder: "Type Something")
@@ -157,14 +155,9 @@ class ChatViewController:UITableViewController {
         
         
         sendButton.translatesAutoresizingMaskIntoConstraints = false
-        // messages.append(newMessage
+   
         textField1.backgroundColor = .white
-        //        let stack = UIStackView(arrangedSubviews: [textField1, addimageButton, sendButton ])
-        //        stack.translatesAutoresizingMaskIntoConstraints = false
-        //        stack.axis = .horizontal
-        //        stack.spacing = 10
-        //        view.addSubview(stack)
-        //        stack.backgroundColor = .white
+        
         view.addSubview(textField1)
         view.addSubview(sendButton)
         view.addSubview(addimageButton)
@@ -173,12 +166,7 @@ class ChatViewController:UITableViewController {
         addimageButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
-            //            stack.leftAnchor.constraint(equalTo: view.leftAnchor,constant: 5),
-            //            //stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 5),
-            //            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 5),
-            //            stack.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -10),
-            //            stack.heightAnchor.constraint(equalToConstant: 50)
+          
             textField1.leftAnchor.constraint(equalTo:view.leftAnchor, constant: 5),
             textField1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
             textField1.heightAnchor.constraint(equalToConstant: 50),
@@ -206,20 +194,32 @@ class ChatViewController:UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if messages[indexPath.row].imageChat == "" {
         let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell" , for: indexPath) as! MessageCell
         let messagesItem = messages[indexPath.row]
         cell.messageItem = messagesItem
         cell.backgroundColor = .white
         return cell
+    }else{
+        let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
+                    cell.messageItem = messages[indexPath.row]
+        Storagemanager.shared.downloadImageWithPath(path: messages[indexPath.row].imageChat!, completion: { image in
+                        DispatchQueue.main.async {
+                            cell.chatImage.image = image
+                        }
+                    })
+
+        cell.backgroundColor = .white
+                               return cell
+        
+    }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 50
-//    }
+
     
 }
 
