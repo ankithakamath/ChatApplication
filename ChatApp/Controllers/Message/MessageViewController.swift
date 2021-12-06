@@ -52,8 +52,8 @@ class MessageViewController: UIViewController {
             navigationController?.navigationBar.compactAppearance = appearance
             navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapCompose))
-       
-        view.addSubview(noMessageLabel)
+        navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: UIImage(systemName: "person.3"),style: .plain, target: self, action: #selector(didTapGroupChat))
+        //view.addSubview(noMessageLabel)
         
     }
     
@@ -68,7 +68,10 @@ class MessageViewController: UIViewController {
         validateAuth()
         
     }
-    
+    @objc func didTapGroupChat(){
+        print("group chat functionality")
+        
+    }
     @objc func didTapCompose(){
         let vc = NewMessageViewController()
         vc.currentUser = currentUser
@@ -119,9 +122,6 @@ class MessageViewController: UIViewController {
     func configureCollectionView(){
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
-       // collectionView.backgroundColor = .white
-        //collectionView.layer.borderColor = UIColor.lightGray.cgColor
-        //collectionView.layer.borderWidth = 2
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "conversationCell")

@@ -18,18 +18,7 @@ class MessageCell: UITableViewCell {
     let uid = Auth.auth().currentUser?.uid
     var messageItem: Message? {
         didSet {
-            var isSender : Bool
-            guard let uid = DatabaseManager.shared.getUID() else { return }
-            if uid != messageItem?.sender {
-                isSender = false
-            }else{
-                isSender = true
-            }
-            if messageItem!.imageChat! == "" {
-                configure(isSender: isSender)
-            } else {
-                configureChatImage(isSender: isSender)
-            }
+            configure()
         }
     }
     
@@ -54,15 +43,15 @@ class MessageCell: UITableViewCell {
         messageContainer.translatesAutoresizingMaskIntoConstraints = false
         return messageContainer
     }()
-
+    
     
     let chatImage: UIImageView = {
         let chatimage = UIImageView()
-       
+        
         chatimage.heightAnchor.constraint(equalToConstant: 200).isActive = true
         chatimage.widthAnchor.constraint(equalToConstant: 200).isActive = true
         chatimage.clipsToBounds = true
-        chatimage.contentMode = .scaleAspectFit
+        chatimage.contentMode = .scaleAspectFill
         chatimage.translatesAutoresizingMaskIntoConstraints = false
         return chatimage
     }()
@@ -78,7 +67,7 @@ class MessageCell: UITableViewCell {
     }
     
     
-    func configure(isSender: Bool){
+    func configure(){
         leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 5)
         rightConstraint =  messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -5)
         
@@ -89,92 +78,33 @@ class MessageCell: UITableViewCell {
         addSubview(messageContainer)
         messageContainer.addSubview(messageContent)
         messageContainer.addSubview(time)
+        messageContainer.widthAnchor.constraint(equalToConstant: 250).priority = UILayoutPriority(999)
+        rightConstraint?.priority = UILayoutPriority(997)
         
-        if isSender{
-            leftConstraint?.isActive =  false
-            rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemMint
-        }else{
-            leftConstraint?.isActive =  true
-            rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray2
-            
-        }
-
         NSLayoutConstraint.activate([
-            messageContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
-            messageContainer.topAnchor.constraint(equalTo: topAnchor, constant: 5),
+            
             messageContainer.widthAnchor.constraint(equalToConstant: 250),
-           
-            messageContent.topAnchor.constraint(equalTo: messageContainer.topAnchor, constant: 5),
-            messageContent.leftAnchor.constraint(equalTo: messageContainer.leftAnchor, constant: 5),
-            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
-            time.rightAnchor.constraint(equalTo: messageContainer.rightAnchor),
-            time.leftAnchor.constraint(equalTo: messageContent.rightAnchor),
-            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor)
-//            messageContainer.widthAnchor.constraint(equalToConstant: 220),
-//            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 5),
-//            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor,constant: 5),
-//
-//            messageContent.leftAnchor.constraint(equalTo:messageContainer.leftAnchor,constant: 10),
-//            messageContent.topAnchor.constraint(equalTo:messageContainer.topAnchor,constant: 10),
-//            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
-//            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
-//            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
-//            time.widthAnchor.constraint(equalToConstant: 80),
-//            messageContent.rightAnchor.constraint(equalTo:time.leftAnchor,constant:-10),
-        ])
-    }
-    
-    
-    func configureChatImage(isSender: Bool){
-        Storagemanager.shared.downloadImageWithPath(path: messageItem!.imageChat!, completion: { image in
-            DispatchQueue.main.async {
-                self.chatImage.image = image
-            }
-        })
-        leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 5)
-        rightConstraint = messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -5)
-        
-        messageContent.text = messageItem?.content
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "hh:mm:a"
-        time.text = dateFormatter.string(from: messageItem!.time)
-        addSubview(messageContainer)
-        messageContainer.addSubview(chatImage)
-        messageContainer.addSubview(time)
-        if isSender{
-            leftConstraint?.isActive =  false
-            rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemMint
-        }else{
-            leftConstraint?.isActive =  true
-            rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray2
-        }
-        NSLayoutConstraint.activate([
-            
-            messageContainer.topAnchor.constraint(equalTo: topAnchor, constant: 5),
+            messageContainer.topAnchor.constraint(equalTo: topAnchor,constant: 5),
             messageContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
-            messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor, constant: 10),
-            messageContainer.heightAnchor.constraint(equalTo: chatImage.heightAnchor, constant: 40 ),
-            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor, constant: 5),
-            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor),
+            messageContent.topAnchor.constraint(equalTo: messageContainer.topAnchor, constant: 5),
+            messageContent.leftAnchor.constraint(equalTo: messageContainer.leftAnchor),
+            time.topAnchor.constraint(equalTo: messageContent.bottomAnchor),
+            time.leftAnchor.constraint(equalTo: messageContent.rightAnchor),
             time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor),
             time.rightAnchor.constraint(equalTo: messageContainer.rightAnchor)
-            
-//            messageContainer.widthAnchor.constraint(equalTo: chatImage.widthAnchor),
-//            messageContainer.topAnchor.constraint(equalTo:topAnchor,constant: 10),
-//            messageContainer.bottomAnchor.constraint(equalTo:bottomAnchor),
-//            chatImage.topAnchor.constraint(equalTo: messageContainer.topAnchor,constant: 5),
-//            chatImage.centerXAnchor.constraint(equalTo: messageContainer.centerXAnchor),
-//            time.rightAnchor.constraint(equalTo:messageContainer.rightAnchor,constant: -5),
-//            time.topAnchor.constraint(equalTo: chatImage.bottomAnchor),
-//            time.bottomAnchor.constraint(equalTo: messageContainer.bottomAnchor, constant: 0),
-//            time.widthAnchor.constraint(equalToConstant: 80)
-            
         ])
         
+        if messageItem?.sender == DatabaseManager.shared.getUID(){
+            leftConstraint?.isActive =  false
+            rightConstraint?.isActive = true
+            messageContainer.backgroundColor = .systemMint
+        }else{
+            leftConstraint?.isActive =  true
+            rightConstraint?.isActive = false
+            messageContainer.backgroundColor = .systemGray2
+            
+        }
     }
+    
     
 }

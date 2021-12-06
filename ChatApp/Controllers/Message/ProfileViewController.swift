@@ -18,6 +18,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     var otherUser: UserData!
     var currentUser: UserData?
     var imageView : UIImageView! = UIImageView()
+    var resetButton : UIButton! = UIButton()
     let username: UILabel! = {
         let label = UILabel()
         label.textColor = .black
@@ -34,6 +35,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         tableView.tableHeaderView = createTableHeader()
         fetchUser()
         configurenavbar()
+        hidesBottomBarWhenPushed = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,7 +58,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         
         
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width
-                                              , height: 300))
+                                              , height: 500))
         headerView.backgroundColor = .white
         
         imageView = UIImageView(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 25, width: 250, height: 250))
@@ -66,12 +68,32 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         imageView.layer.cornerRadius = 125
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
+        
+        resetButton = UIButton(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 350, width: 250, height: 50))
+        resetButton.layer.borderColor = UIColor.systemMint.cgColor
+        resetButton.layer.cornerRadius = 20
+        resetButton.backgroundColor = .systemMint
+        resetButton.setTitle("Reset Password", for: .normal)
+        resetButton.titleLabel?.textColor = .blue
+        resetButton.addTarget(self, action: #selector(handleReset), for: .touchUpInside)
         headerView.addSubview(imageView)
-        headerView.addSubview(username)
+        headerView.addSubview(resetButton)
+        
         return headerView
         
     }
     
+    @objc func handleReset() {
+        
+        DatabaseManager.shared.resetPassword(email: currentUser!.email) { result in
+                if result == "Sent" {
+                    self.showAlert(title: "Password Reset Email Sent", messageContent: "A Password Reset link has been sent to your Email")
+                } else {
+                    self.showAlert(title: "Failed", messageContent: "Error while reseting the Password. Try Again Later")
+                }
+            }
+        }
+
     @objc func presentImagePicker() {
         let picker = UIImagePickerController()
         picker.allowsEditing = true

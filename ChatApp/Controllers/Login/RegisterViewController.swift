@@ -14,15 +14,17 @@ class RegisterViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .systemMint
         configureUI()
+        configureNotificationObserver()
+        createDismissKeyboardTapGesture()
     }
     
     var firstNameTextField = CustomTextField(placeholder: "Enter First Name")
     var lastNameTextField = CustomTextField(placeholder: "Enter last Name")
     var emailTextField = CustomTextField(placeholder: "Enter Valid Email")
     var passwordTextField = CustomTextField(placeholder: "Enter Valid Password")
-    
+    let scrollview = UIScrollView()
     let photoButton: UIImageView = {
         
         let imageView = UIImageView()
@@ -31,10 +33,10 @@ class RegisterViewController: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.borderWidth = 5
         imageView.layer.borderColor = UIColor.lightGray.cgColor
-        imageView.layer.cornerRadius = 50
+        imageView.layer.cornerRadius = 100
         imageView.clipsToBounds = true
-        imageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        imageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         return imageView
@@ -142,24 +144,45 @@ class RegisterViewController: UIViewController {
         
         let stack = UIStackView(arrangedSubviews: [firstNameContainer,lastNameContainer,usernameContainer,passwordContainer,signupButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
+        scrollview.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 10
-        view.addSubview(stack)
-        view.addSubview(photoButton)
-        photoButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        view.addSubview(scrollview)
+        scrollview.addSubview(photoButton)
+        scrollview.addSubview(stack)
+        scrollview.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        scrollview.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        scrollview.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollview.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        photoButton.topAnchor.constraint(equalTo: scrollview.topAnchor, constant: 0).isActive = true
         photoButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        stack.topAnchor.constraint(equalTo: photoButton.bottomAnchor, constant: 10).isActive = true
+        stack.topAnchor.constraint(equalTo: photoButton.bottomAnchor, constant: 20).isActive = true
         stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-        //photoButton.layer.cornerRadius = photoButton.frame.size.width/2
-        //photoButton.layer.cornerRadius = 1
-        //passwordTextField.isSecureTextEntry = true
+      
         photoButton.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapChangeProfileImage))
         photoButton.addGestureRecognizer(gesture)
         
         
     }
+    
+    
+    func configureNotificationObserver(){
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(scrollingTheView), name: UIDevice.orientationDidChangeNotification, object: nil)
+      }
+    
+    @objc func scrollingTheView() {
+    
+            scrollview.contentSize = CGSize(width: view.frame.width, height: 1000)
+        }
+    
+    func createDismissKeyboardTapGesture(){
+            let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
+            view.addGestureRecognizer(tap)
+        }
+    
 }
 
 extension RegisterViewController: UITextFieldDelegate {

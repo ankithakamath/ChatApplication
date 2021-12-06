@@ -11,6 +11,14 @@ import JGProgressHUD
 
 class LoginViewController: UIViewController {
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemMint
+        configureUI()
+        configureNotificationObserver()
+         createDismissKeyboardTapGesture()
+    }
+    
     private let spinner = JGProgressHUD(style: .dark)
     
     
@@ -25,7 +33,7 @@ class LoginViewController: UIViewController {
     lazy var passwordContainer: InputContainer = {
         return InputContainer(image: UIImage(systemName: "lock.fill")!, textField: passwordTextField)
     }()
-    
+    let scrollview = UIScrollView()
     let photoButton: UIImageView = {
         
         let imageView = UIImageView()
@@ -53,12 +61,22 @@ class LoginViewController: UIViewController {
         
         return button
     }()
-    
+    let resetButton : UIButton = {
+        let button = UIButton()
+        button.setTitle("Forgot password ?", for: .normal)
+        button.tintColor = .red
+        button.backgroundColor = .systemMint
+        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        button.addTarget(self, action: #selector(handleForgotPassword), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
+    }()
     let SignupButton: UIButton = {
         let button = UIButton()
         button.setTitle("Signup", for: .normal)
         button.tintColor = .red
-        button.backgroundColor = .green
+        button.backgroundColor = .systemBlue
         button.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         button.addTarget(self, action: #selector(handleSignup), for: .touchUpInside)
@@ -70,12 +88,19 @@ class LoginViewController: UIViewController {
     let descriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .darkGray
-        label.backgroundColor = .lightGray
+        label.backgroundColor = .systemMint
         label.font = UIFont.systemFont(ofSize: 18)
         label.text = "Dont have an account?"
         return label
     }()
     
+    
+    @objc func handleForgotPassword() {
+           
+           let resetVC = ResetViewController()
+           resetVC.modalPresentationStyle = .fullScreen
+           navigationController?.pushViewController(resetVC, animated: true)
+       }
     
     @objc func loginButtonTapped(){
         let error = validateFields()
@@ -117,6 +142,11 @@ class LoginViewController: UIViewController {
         return nil
     }
     
+    func createDismissKeyboardTapGesture(){
+            let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
+            view.addGestureRecognizer(tap)
+        }
+    
     func alertUser(){
         let alert = UIAlertController(title: "OOPS", message: "Please fill all fields to login", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
@@ -132,15 +162,23 @@ class LoginViewController: UIViewController {
     
     
     func configureUI() {
-        let stack = UIStackView(arrangedSubviews: [photoButton,emailContainer, passwordContainer,loginButton,descriptionLabel,SignupButton])
+       
+        let stack = UIStackView(arrangedSubviews: [photoButton,emailContainer, passwordContainer,loginButton,resetButton,descriptionLabel,SignupButton])
         stack.spacing = 10
-        view.addSubview(stack)
+        view.addSubview(scrollview)
+        scrollview.addSubview(stack)
+        scrollview.translatesAutoresizingMaskIntoConstraints = false
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
-        
-        stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-        stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        scrollview.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        scrollview.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        scrollview.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollview.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        stack.topAnchor.constraint(equalTo: scrollview.topAnchor, constant: 5).isActive = true
+        stack.leftAnchor.constraint(equalTo: scrollview.leftAnchor, constant: 20).isActive = true
+        stack.rightAnchor.constraint(equalTo: scrollview.rightAnchor, constant: -20).isActive = true
+        stack.centerXAnchor.constraint(equalTo: scrollview.centerXAnchor).isActive = true
+        scrollview.contentSize = CGSize(width: view.frame.width, height: 1000)
         passwordTextField.isSecureTextEntry = false
         emailTextField.delegate = self
         passwordTextField.delegate = self
@@ -149,12 +187,7 @@ class LoginViewController: UIViewController {
     }
     
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        //title = "Login"
-        view.backgroundColor = .lightGray
-        configureUI()
-    }
+   
     
     static func isPasswordValid(_ password : String) -> Bool {
         
@@ -168,6 +201,15 @@ class LoginViewController: UIViewController {
         return emailTest.evaluate(with: email)
     }
     
+    func configureNotificationObserver(){
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(scrollingTheView), name: UIDevice.orientationDidChangeNotification, object: nil)
+      }
+    
+    @objc func scrollingTheView() {
+    
+            scrollview.contentSize = CGSize(width: view.frame.width, height: 1000)
+        }
 }
 
 
