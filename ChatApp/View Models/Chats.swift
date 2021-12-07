@@ -31,5 +31,7 @@ struct Chats: Comparable {
     var lastMessage: Message?
     var messages: [Message]?
     var otherUser: Int?
-    var unSeenCount: Int?
+    var isGroupChat: Bool?
+    var groupName: String?
+    var groupIconPath: String?
 }

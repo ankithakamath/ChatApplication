@@ -1,10 +1,10 @@
+
 //
 //  NewMessageViewController.swift
 //  ChatApp
 //
 //  Created by Ankitha Kamath on 15/11/21.
 //
-
 import UIKit
 import SwiftUI
 import FirebaseAuth
@@ -50,6 +50,7 @@ class NewMessageViewController: UIViewController {
         configureSearchBar()
         configureCollectionView()
         fetchAllUser()
+        hidesBottomBarWhenPushed = true
     }
     
     override func viewDidLayoutSubviews() {
@@ -149,9 +150,8 @@ extension NewMessageViewController: UICollectionViewDataSource {
             
         }
         print("New Chat")
-        DatabaseManager.shared.addChat(user1: currentUser!, user2: selectedUser, id: id)
-        
-        chatVC.chat = Chats(chatId: id, users: users, lastMessage: nil, messages: [], otherUser: 1)
+        DatabaseManager.shared.addChat(users: [currentUser!, selectedUser], id: id, isGroupChat: false, groupName: "", groupIconPath: "")
+        chatVC.chat = Chats(chatId: id, users: users, lastMessage: nil, messages: [], otherUser: 1, isGroupChat: false)
         
         vcArray?.append(chatVC)
         navigationController?.setViewControllers(vcArray!, animated: true)

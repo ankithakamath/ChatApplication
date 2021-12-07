@@ -14,8 +14,9 @@ class ChatViewController:UITableViewController {
     let cellIdentifier = "chatCell"
     var otherUser: UserData!
     var currentUser: UserData!
-    var chatId: String?
+    //var chatId: String?
     var chat:Chats!
+    let uid = DatabaseManager.shared.getUID()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +31,7 @@ class ChatViewController:UITableViewController {
         
     }
     func configureTableView() {
-
+        
         tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 100, right: 0)
         tableView.separatorStyle = .none
         tableView.register(MessageCell.self, forCellReuseIdentifier: "messageCell")
@@ -73,10 +74,11 @@ class ChatViewController:UITableViewController {
     }
     
     @objc func sendChat(){
+        
         if textField1.text != "" {
             let newMessage = Message(sender: currentUser.uid, content: textField1.text!, time: Date(), seen: false, imageChat: "")
             messages.append(newMessage)
-            DatabaseManager.shared.addMessage(messages: messages, lastMessage: newMessage, id: chatId!)
+            DatabaseManager.shared.addMessage(messages: messages, lastMessage: newMessage, id: chat.chatId!)
             textField1.text = ""
         }
     }
@@ -97,6 +99,10 @@ class ChatViewController:UITableViewController {
     
     func fetchChats() {
         messages = []
+        DatabaseManager.shared.getUser(uid: uid!) { user in
+            self.currentUser = user
+        }
+        
         DatabaseManager.shared.fetchMessages(chatId: chat.chatId!) { messages in
             
             self.messages = messages
@@ -132,30 +138,41 @@ class ChatViewController:UITableViewController {
     
     
     func uploadPhoto(image: UIImage) {
-        let path = "Chats/\(chatId!)/\(UUID())"
+        let path = "Chats/\(chat.chatId!)/\(UUID())"
         let newMessage = Message(sender: self.currentUser.uid, content: "", time: Date(), seen: false, imageChat: path)
         var messagesArray = self.messages
         messagesArray.append(newMessage)
         uploadImagetoDb(image: image, name: path) { url in
             
         }
-        DatabaseManager.shared.addMessage(messages: messagesArray, lastMessage: newMessage, id: self.chatId!)
+        DatabaseManager.shared.addMessage(messages: messagesArray, lastMessage: newMessage, id: chat.chatId!)
         self.tableView.reloadData()
     }
     
     func configure() {
-        chatId = "\(chat.users[0].uid)_\(chat.users[1].uid)"
-        if chat.otherUser == 0 {
-            otherUser = chat.users[0]
-            currentUser = chat.users[1]
+        //        chatId = "\(chat.users[0].uid)_\(chat.users[1].uid)"
+        //        if chat.otherUser == 0 {
+        //            otherUser = chat.users[0]
+        //            currentUser = chat.users[1]
+        //        } else {
+        //            otherUser = chat.users[1]
+        //            currentUser = chat.users[0]
+        //        }
+        var name: String
+        if chat.isGroupChat! {
+            name = chat.groupName!
         } else {
-            otherUser = chat.users[1]
-            currentUser = chat.users[0]
+            if chat.users[0].uid == uid {
+                name = chat.users[1].username
+            } else {
+                name = chat.users[0].username
+            }
         }
+        navigationItem.title = name
         
         
         sendButton.translatesAutoresizingMaskIntoConstraints = false
-   
+        
         textField1.backgroundColor = .white
         
         view.addSubview(textField1)
@@ -166,7 +183,7 @@ class ChatViewController:UITableViewController {
         addimageButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-          
+            
             textField1.leftAnchor.constraint(equalTo:view.leftAnchor, constant: 5),
             textField1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
             textField1.heightAnchor.constraint(equalToConstant: 50),
@@ -195,31 +212,34 @@ class ChatViewController:UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if messages[indexPath.row].imageChat == "" {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell" , for: indexPath) as! MessageCell
-        let messagesItem = messages[indexPath.row]
-        cell.messageItem = messagesItem
-        cell.backgroundColor = .white
-        return cell
-    }else{
-        let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
-                    cell.messageItem = messages[indexPath.row]
-        Storagemanager.shared.downloadImageWithPath(path: messages[indexPath.row].imageChat!, completion: { image in
-                        DispatchQueue.main.async {
-                            cell.chatImage.image = image
-                        }
-                    })
-
-        cell.backgroundColor = .white
-                               return cell
-        
-    }
+            let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell" , for: indexPath) as! MessageCell
+            let messagesItem = messages[indexPath.row]
+            cell.messageItem = messagesItem
+            cell.backgroundColor = .white
+            cell.usersList = chat.users
+            return cell
+        }else{
+            let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
+            cell.messageItem = messages[indexPath.row]
+            cell.usersList = chat.users
+            Storagemanager.shared.downloadImageWithPath(path: messages[indexPath.row].imageChat!, completion: { image in
+                DispatchQueue.main.async {
+                    cell.chatImage.image = image
+                    
+                }
+            })
+            
+            cell.backgroundColor = .white
+            return cell
+            
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-
+    
     
 }
 
@@ -227,7 +247,7 @@ extension ChatViewController: UIImagePickerControllerDelegate, UINavigationContr
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let imageSelected = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
             uploadPhoto(image: imageSelected)
-         
+            
         }
         
         dismiss(animated: true, completion: nil)

@@ -37,6 +37,7 @@ class MessageViewController: UIViewController {
         //view.backgroundColor = .lightGray
         title = "chats"
         validateAuth()
+        //DatabaseManager.shared.onLogout()
     }
     
     @objc func didTapEdit() {
@@ -69,7 +70,8 @@ class MessageViewController: UIViewController {
         
     }
     @objc func didTapGroupChat(){
-        print("group chat functionality")
+      let groupVC = GroupChatViewController()
+        navigationController?.pushViewController(groupVC, animated: true)
         
     }
     @objc func didTapCompose(){
