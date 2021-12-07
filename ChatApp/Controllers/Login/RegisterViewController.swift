@@ -98,14 +98,16 @@ class RegisterViewController: UIViewController {
                     return
                 }
                 let uid = authResult?.user.uid
-                
-                Storagemanager.ImageUploader.uploadImage(image: profilePic!, uid: uid!) { url in
-                    let newUser = UserData(username: firstName, email: email, profileURL: url, uid: uid!)
-                    DatabaseManager.shared.addUser(user: newUser)
+                let path = "Profile/\(uid!)"
+                Storagemanager.ImageUploader.uploadImage(image: profilePic! , path: path) { url in
+                 
                     self?.dismiss(animated: true)
                 }
+                let newUser = UserData(username: firstName, email: email, profileURL: "Profile/\(uid!)", uid: uid!)
+                DatabaseManager.shared.addUser(user: newUser)
                 self?.presentingViewController?.dismiss(animated: true, completion: nil)
             }
+            
         }
     }
     

@@ -4,27 +4,27 @@
 //
 //  Created by Ankitha Kamath on 09/11/21.
 //
-
 import UIKit
+import SwiftUI
 
 class CollectionViewCell: UICollectionViewCell {
     
     static let reuseIdentifier = "conversationCell"
     
-   
+    
     var isChecked: Bool = false
     var isEditing: Bool = false
     var chat: Chats? {
-            didSet {
-                configureChat()
-            }
+        didSet {
+            configureChat()
         }
+    }
     
     var lastMessageItem: Message? {
-          didSet {
-              checkLastMessage()
-          }
-      }
+        didSet {
+            checkLastMessage()
+        }
+    }
     
     var imageView : UIImageView = {
         let iv = UIImageView()
@@ -53,7 +53,7 @@ class CollectionViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 18)
         label.text = "Message"
         label.textColor = .black
-        label.backgroundColor = .systemBackground
+        // label.backgroundColor = .systemBackground
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
@@ -81,19 +81,18 @@ class CollectionViewCell: UICollectionViewCell {
     
     func configureCheckBox(){
         print(".....................")
-
+        
     }
-   
+    
     
     required init?(coder: NSCoder) {
         fatalError()
     }
     
     func checkLastMessage() {
-            messageLabel.text = lastMessageItem?.content
-            //let sentImage = UIImageView()
-
-        }
+        messageLabel.text = lastMessageItem?.content
+        //let sentImage = UIImageView()
+    }
     
     func configure(){
         layer.borderWidth = 2
@@ -106,7 +105,7 @@ class CollectionViewCell: UICollectionViewCell {
         messageLabel.numberOfLines = 1
         messageLabel.widthAnchor.constraint(equalToConstant: 170).isActive = true
         messageLabel.textAlignment = .left
-       
+        
         imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
         imageView.widthAnchor.constraint(equalToConstant: 70).isActive = true
@@ -124,26 +123,33 @@ class CollectionViewCell: UICollectionViewCell {
     }
     
     func configureChat() {
-            guard let chat = chat else { return }
+        guard let chat = chat else { return }
+        
+        lastMessageItem = chat.lastMessage
+        var path: String
+        if chat.isGroupChat!{
+            nameLabel.text = chat.groupName
+            path = chat.groupIconPath!
+        }else{
             let otherUser = chat.users[chat.otherUser!]
             nameLabel.text = otherUser.username
-            lastMessageItem = chat.lastMessage
-           
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "hh:mm:a"
-            if chat.lastMessage == nil {
-                timeLabel.text = ""
-             
-            } else {
-                timeLabel.text = dateFormatter.string(from: chat.lastMessage!.time)
-            }
-          Storagemanager.shared.downloadImageWithPath(path: "Profile/\(otherUser.uid)") { image in
-                DispatchQueue.main.async {
-                    self.imageView.image = image
-                }
-                
+            path = "Profile/\(otherUser.uid)"
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm:a"
+        if chat.lastMessage == nil {
+            timeLabel.text = ""
+            
+        } else {
+            timeLabel.text = dateFormatter.string(from: chat.lastMessage!.time)
+        }
+        Storagemanager.shared.downloadImageWithPath(path: path) { image in
+            DispatchQueue.main.async {
+                self.imageView.image = image
             }
             
         }
- 
+        
+    }
+    
 }

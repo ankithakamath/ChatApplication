@@ -19,6 +19,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     var currentUser: UserData?
     var imageView : UIImageView! = UIImageView()
     var resetButton : UIButton! = UIButton()
+    var nameLabel: UILabel! = UILabel()
     let username: UILabel! = {
         let label = UILabel()
         label.textColor = .black
@@ -35,7 +36,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         tableView.tableHeaderView = createTableHeader()
         fetchUser()
         configurenavbar()
-        hidesBottomBarWhenPushed = true
+        hidesBottomBarWhenPushed = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,6 +69,14 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         imageView.layer.cornerRadius = 125
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
+        nameLabel = UILabel(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 300, width: 250, height: 40))
+       // nameLabel.backgroundColor = .white
+        nameLabel.layer.borderColor = UIColor.systemMint.cgColor
+        nameLabel.layer.borderWidth = 2
+        //nameLabel.text = "aaaa"
+        nameLabel.textColor = .black
+        nameLabel.textAlignment = .center
+       // nameLabel.text = currentUser?.username
         
         resetButton = UIButton(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 350, width: 250, height: 50))
         resetButton.layer.borderColor = UIColor.systemMint.cgColor
@@ -78,7 +87,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         resetButton.addTarget(self, action: #selector(handleReset), for: .touchUpInside)
         headerView.addSubview(imageView)
         headerView.addSubview(resetButton)
-        
+        headerView.addSubview(nameLabel)
         return headerView
         
     }
@@ -105,7 +114,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         let userid = DatabaseManager.shared.getUID()
         DatabaseManager.shared.getUser(uid: userid!) { [self] user in
             self.currentUser = user
-            
+            nameLabel.text = currentUser?.username
             Storagemanager.shared.downloadImageWithPath(path: "Profile/\(currentUser!.uid)") { image in
                 DispatchQueue.main.async {
                     self.imageView.image = image
@@ -116,18 +125,19 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     }
     
     //
-    func downloadImage(imageView: UIImageView, url: URL) {
-        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            DispatchQueue.main.async {
-                let image = UIImage(data: data)
-                imageView.image = image
-            }
-        }).resume()
-    }
+//    func downloadImage(imageView: UIImageView, url: URL) {
+//        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+//            guard let data = data, error == nil else {
+//                return
+//            }
+//
+//            DispatchQueue.main.async {
+//                let image = UIImage(data: data)
+//                imageView.image = image
+//            }
+//        }).resume()
+//    }
+    
 }
 
 extension ProfileViewController: UITableViewDelegate,UITableViewDataSource{
@@ -149,8 +159,10 @@ extension ProfileViewController: UITableViewDelegate,UITableViewDataSource{
             let isLoggedOut = DatabaseManager.shared.onLogout()
             if isLoggedOut{
                 let vc = LoginViewController()
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: true)
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen
+                self.present(nav,animated: false)
+               // dismiss(animated: true)
             }
         }
     }
