@@ -23,12 +23,7 @@ class NewMessageViewController: UIViewController {
         return !searchController.searchBar.text!.isEmpty
     }
     
-    //    private let searchBar: UISearchBar = {
-    //        let searchBar = UISearchBar()
-    //        searchBar.placeholder = "search for contacts"
-    //
-    //        return searchBar
-    //    }()
+    
     let searchController = UISearchController(searchResultsController: nil)
     
     private let noResultLabel: UILabel = {
@@ -46,7 +41,7 @@ class NewMessageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(noResultLabel)
-        view.backgroundColor = .lightGray
+        
         configureSearchBar()
         configureCollectionView()
         fetchAllUser()
@@ -61,8 +56,9 @@ class NewMessageViewController: UIViewController {
     
     func configureCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
-        
         view.addSubview(collectionView)
+        collectionView.backgroundColor =  UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "conversationCell")
@@ -79,6 +75,7 @@ class NewMessageViewController: UIViewController {
     
     func configureSearchBar(){
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(didTapCancel))
+        navigationItem.rightBarButtonItem?.tintColor =  UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
         searchController.loadViewIfNeeded()
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
@@ -87,6 +84,8 @@ class NewMessageViewController: UIViewController {
         searchController.searchBar.returnKeyType = UIReturnKeyType.done
         self.navigationItem.searchController = searchController
         navigationItem.searchController?.automaticallyShowsCancelButton = true
+        navigationItem.rightBarButtonItem?.tintColor =  UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
+        navigationItem.backBarButtonItem?.tintColor =  UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
         self.navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
         
@@ -122,7 +121,7 @@ extension NewMessageViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("selectttttttttttttt")
+        
         let selectedUser = users[indexPath.row]
         let users: [UserData] = [currentUser!, selectedUser]
         
@@ -155,7 +154,7 @@ extension NewMessageViewController: UICollectionViewDataSource {
         
         vcArray?.append(chatVC)
         navigationController?.setViewControllers(vcArray!, animated: true)
-    
+        
         
     }
 }
@@ -167,7 +166,7 @@ extension NewMessageViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 2
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

@@ -19,8 +19,8 @@ class GroupChatViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        hidesBottomBarWhenPushed = true
+        
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         configureCollectionView()
         configureUI()
         fetchAllUser()
@@ -29,8 +29,8 @@ class GroupChatViewController: UIViewController {
     
     let groupPhotoLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .darkGray
-        
+        label.textColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
+        label.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         label.font = UIFont.systemFont(ofSize: 18)
         label.text = "Group Photo"
         return label
@@ -38,8 +38,8 @@ class GroupChatViewController: UIViewController {
     
     let groupNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .darkGray
-        
+        label.textColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
+        label.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         label.font = UIFont.systemFont(ofSize: 18)
         label.text = "Group Name"
         return label
@@ -48,10 +48,10 @@ class GroupChatViewController: UIViewController {
     let groupPhoto : UIImageView = {
         let image = UIImageView()
         image.image = UIImage(systemName: "person.circle")
-        //image.tintColor = .white
+        image.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+        image.tintColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
         image.contentMode = .scaleAspectFill
         image.layer.borderWidth = 5
-        image.layer.borderColor = UIColor.lightGray.cgColor
         image.layer.cornerRadius = 100
         image.clipsToBounds = true
         image.widthAnchor.constraint(equalToConstant: 200).isActive = true
@@ -70,7 +70,7 @@ class GroupChatViewController: UIViewController {
     
     let selectUsersLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .darkGray
+        label.textColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
         
         label.font = UIFont.systemFont(ofSize: 18)
         label.text = "select Users"
@@ -85,6 +85,7 @@ class GroupChatViewController: UIViewController {
     }
     //
     @objc func handleCreate() {
+        hidesBottomBarWhenPushed = true
         let validateResult = validateGroupChat(groupPhoto: groupPhoto.image!, groupName: groupNameTextField.text!, selectedUsersCount: selectedUsers.count)
         if validateResult == "" {
             let chatVC = ChatViewController()
@@ -124,12 +125,16 @@ class GroupChatViewController: UIViewController {
     }
     
     func configureUI() {
+        groupNameContainer.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
+        groupNameTextField.textColor =  UIColor(red: 0.773, green: 0.808, blue: 0.827, alpha: 1)
+        groupNameTextField.font = UIFont(name: "PTSans-Regular", size: 17)
         groupNameTextField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         
         let createButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(handleCreate))
+        createButton.tintColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
         navigationItem.rightBarButtonItems = [createButton]
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         navigationItem.title = "Create Group Chat"
         navigationItem.backButtonTitle = ""
         
@@ -154,7 +159,7 @@ class GroupChatViewController: UIViewController {
         groupNameContainer.translatesAutoresizingMaskIntoConstraints = false
         selectUsersLabel.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = UIColor.white
+        collectionView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         NSLayoutConstraint.activate([
             
             groupPhotoLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -199,6 +204,7 @@ class GroupChatViewController: UIViewController {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         
         view.addSubview(collectionView)
+        collectionView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "conversationCell")
@@ -241,7 +247,7 @@ extension GroupChatViewController: UICollectionViewDataSource {
         Storagemanager.shared.downloadImageWithPath(path: "Profile/\(user.uid)") { image in
             cell.imageView.image = image
         }
-        
+        cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         return cell
     }
     
@@ -250,10 +256,10 @@ extension GroupChatViewController: UICollectionViewDataSource {
         
         if selectedUsers.contains(indexPath) {
             selectedUsers.remove(at: selectedUsers.firstIndex(of: indexPath)!)
-            selectedCell.backgroundColor = .white
+            selectedCell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         } else {
             selectedUsers.append(indexPath)
-            selectedCell.backgroundColor = .blue
+            selectedCell.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
         }
     }
 }
@@ -264,7 +270,7 @@ extension GroupChatViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 2
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

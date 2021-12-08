@@ -22,7 +22,7 @@ class ChatViewController:UITableViewController {
         super.viewDidLoad()
         configureTableView()
         fetchChats()
-        view.backgroundColor = .white
+        
         configure()
         configurekeyboard()
         
@@ -31,7 +31,7 @@ class ChatViewController:UITableViewController {
         
     }
     func configureTableView() {
-        
+        tableView.backgroundColor  = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 100, right: 0)
         tableView.separatorStyle = .none
         tableView.register(MessageCell.self, forCellReuseIdentifier: "messageCell")
@@ -42,26 +42,26 @@ class ChatViewController:UITableViewController {
     
     let sendButton:UIButton = {
         let sendButton = UIButton()
-        sendButton.backgroundColor = .white
-        sendButton.tintColor = .blue
+        sendButton.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
+        sendButton.tintColor = UIColor(red: 0, green: 0.69, blue: 0.612, alpha: 1)
         sendButton.setImage(UIImage(systemName: "paperplane.circle.fill"), for: .normal)
         sendButton.contentVerticalAlignment = .fill
         sendButton.contentHorizontalAlignment = .fill
         
         sendButton.addTarget(self, action: #selector(sendChat), for: .touchUpInside)
-        sendButton.layer.cornerRadius = 0
+        sendButton.layer.cornerRadius = 25
         return sendButton
     }()
     
     let addimageButton:UIButton = {
         let addimageButton = UIButton()
-        addimageButton.backgroundColor = .white
-        addimageButton.tintColor = .blue
-        addimageButton.setImage(UIImage(systemName: "camera.circle.fill"), for: .normal)
-        addimageButton.contentVerticalAlignment = .fill
-        addimageButton.contentHorizontalAlignment = .fill
+        addimageButton.backgroundColor = .gray
+        addimageButton.tintColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
+        addimageButton.setImage(UIImage(systemName: "camera"), for: .normal)
+        //addimageButton.contentVerticalAlignment = .fill
+        //addimageButton.contentHorizontalAlignment = .fit
         addimageButton.addTarget(self, action: #selector(sendImageChat), for: .touchUpInside)
-        addimageButton.layer.cornerRadius = 0
+        addimageButton.layer.cornerRadius = 25
         return addimageButton
     }()
     
@@ -150,14 +150,7 @@ class ChatViewController:UITableViewController {
     }
     
     func configure() {
-        //        chatId = "\(chat.users[0].uid)_\(chat.users[1].uid)"
-        //        if chat.otherUser == 0 {
-        //            otherUser = chat.users[0]
-        //            currentUser = chat.users[1]
-        //        } else {
-        //            otherUser = chat.users[1]
-        //            currentUser = chat.users[0]
-        //        }
+        
         var name: String
         if chat.isGroupChat! {
             name = chat.groupName!
@@ -173,7 +166,7 @@ class ChatViewController:UITableViewController {
         
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         
-        textField1.backgroundColor = .white
+        textField1.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
         
         view.addSubview(textField1)
         view.addSubview(sendButton)
@@ -181,7 +174,7 @@ class ChatViewController:UITableViewController {
         textField1.translatesAutoresizingMaskIntoConstraints = false
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         addimageButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        textField1.layer.cornerRadius = 20
         NSLayoutConstraint.activate([
             
             textField1.leftAnchor.constraint(equalTo:view.leftAnchor, constant: 5),
@@ -189,7 +182,7 @@ class ChatViewController:UITableViewController {
             textField1.heightAnchor.constraint(equalToConstant: 50),
             textField1.rightAnchor.constraint(equalTo: addimageButton.leftAnchor, constant: 0),
             textField1.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -105),
-            addimageButton.leftAnchor.constraint(equalTo: textField1.rightAnchor),
+            addimageButton.leftAnchor.constraint(equalTo: textField1.rightAnchor, constant: -10),
             addimageButton.widthAnchor.constraint(equalToConstant: 50),
             addimageButton.heightAnchor.constraint(equalToConstant: 50),
             addimageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
@@ -215,13 +208,14 @@ class ChatViewController:UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell" , for: indexPath) as! MessageCell
             let messagesItem = messages[indexPath.row]
             cell.messageItem = messagesItem
-            cell.backgroundColor = .white
+            cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
             cell.usersList = chat.users
             return cell
         }else{
             let cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImageCell
             cell.messageItem = messages[indexPath.row]
             cell.usersList = chat.users
+            
             Storagemanager.shared.downloadImageWithPath(path: messages[indexPath.row].imageChat!, completion: { image in
                 DispatchQueue.main.async {
                     cell.chatImage.image = image
@@ -229,7 +223,7 @@ class ChatViewController:UITableViewController {
                 }
             })
             
-            cell.backgroundColor = .white
+            cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
             return cell
             
         }

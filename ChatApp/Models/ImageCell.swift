@@ -73,7 +73,8 @@ class ImageCell: UITableViewCell {
     }
     let time: UILabel = {
         let time = UILabel()
-        time.textColor = .white
+        time.textColor = UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
+        time.font = UIFont(name: "PTSans-Regular", size: 18)
         time.translatesAutoresizingMaskIntoConstraints =  false
         return time
     }()
@@ -88,7 +89,8 @@ class ImageCell: UITableViewCell {
     var senderName: UILabel = {
         let label = UILabel()
         label.text = ""
-        label.textColor = .blue
+        label.font = UIFont(name: "PTSans-Bold", size: 18)
+        label.textColor =  UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -115,6 +117,8 @@ class ImageCell: UITableViewCell {
       }
     
     func configureChatImage(){
+        
+        //backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         Storagemanager.shared.downloadImageWithPath(path: messageItem!.imageChat!, completion: { image in
             DispatchQueue.main.async {
                 self.chatImage.image = image
@@ -129,7 +133,7 @@ class ImageCell: UITableViewCell {
         if messageItem?.sender == DatabaseManager.shared.getUID(){
             leftConstraint?.isActive =  false
             rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemMint
+            messageContainer.backgroundColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
             senderName.isHidden = true
             receiverConstraint.isActive = false
             senderConstraint.isActive = false
@@ -137,7 +141,7 @@ class ImageCell: UITableViewCell {
         }else{
             leftConstraint?.isActive =  true
             rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray2
+            messageContainer.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
             currentConstraint.isActive = false
             receiverConstraint.isActive = true
             senderConstraint.isActive = true

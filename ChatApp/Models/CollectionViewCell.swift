@@ -28,10 +28,9 @@ class CollectionViewCell: UICollectionViewCell {
     
     var imageView : UIImageView = {
         let iv = UIImageView()
-        iv.backgroundColor = .gray
         iv.contentMode = .scaleAspectFill
+        iv.tintColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
         iv.clipsToBounds = true
-        iv.layer.borderWidth = 2
         iv.layer.cornerRadius = 35
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.layer.borderColor = UIColor.white.cgColor
@@ -41,31 +40,30 @@ class CollectionViewCell: UICollectionViewCell {
     
     var nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 20)
-        label.text = "Name"
-        label.textColor = .black
+        label.textColor = UIColor(red: 0.827, green: 0.855, blue: 0.878, alpha: 1)
+        label.font = UIFont(name: "PTSans-Regular", size: 21)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     var messageLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18)
-        label.text = "Message"
-        label.textColor = .black
-        // label.backgroundColor = .systemBackground
+       
+        label.textColor = UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
+
         label.translatesAutoresizingMaskIntoConstraints = false
-        
+        label.font = UIFont(name: "PTSans-Regular", size: 18)
         return label
     }()
     
     var timeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textColor = .gray
-        label.backgroundColor = .systemBackground
-        label.translatesAutoresizingMaskIntoConstraints = false
         
+       
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
+
+        label.font = UIFont(name: "PTSans-Regular", size: 18)
         return label
     }()
     
@@ -75,15 +73,10 @@ class CollectionViewCell: UICollectionViewCell {
         configureChat()
         imageView.layer.cornerRadius = 35
         contentView.clipsToBounds = true
-        configureCheckBox()
         
     }
     
-    func configureCheckBox(){
-        print(".....................")
-        
-    }
-    
+  
     
     required init?(coder: NSCoder) {
         fatalError()
@@ -95,9 +88,9 @@ class CollectionViewCell: UICollectionViewCell {
     }
     
     func configure(){
-        layer.borderWidth = 2
-        layer.borderColor = UIColor.gray.cgColor
-        backgroundColor = .systemBackground
+        backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+       layer.borderWidth = 1
+        layer.borderColor = UIColor(red: 0.094, green: 0.145, blue: 0.176, alpha: 1).cgColor
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(messageLabel)

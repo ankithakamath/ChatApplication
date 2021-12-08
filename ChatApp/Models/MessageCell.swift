@@ -30,9 +30,11 @@ class MessageCell: UITableViewCell {
         }
     }
     
+
     let messageContent :UILabel = {
         let message = UILabel()
-        message.textColor = .label
+       message.textColor = UIColor(red: 0.827, green: 0.855, blue: 0.878, alpha: 1)
+       message.font = UIFont(name: "PTSans-Regular", size: 21)
         message.numberOfLines = 0
         message.translatesAutoresizingMaskIntoConstraints =  false
         return message
@@ -40,7 +42,8 @@ class MessageCell: UITableViewCell {
     
     let time: UILabel = {
         let time = UILabel()
-        time.textColor = .white
+       time.textColor = UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
+       time.font = UIFont(name: "PTSans-Regular", size: 18)
         time.translatesAutoresizingMaskIntoConstraints =  false
         return time
     }()
@@ -67,7 +70,8 @@ class MessageCell: UITableViewCell {
     var senderName: UILabel = {
         let label = UILabel()
         label.text = ""
-        label.textColor = .blue
+        label.font = UIFont(name: "PTSans-Bold", size: 18)
+        label.textColor =  UIColor(red: 0.561, green: 0.604, blue: 0.627, alpha: 1)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -76,6 +80,8 @@ class MessageCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+      
         leftConstraint =   messageContainer.leftAnchor.constraint(equalTo: leftAnchor,constant: 5)
         rightConstraint =  messageContainer.rightAnchor.constraint(equalTo:rightAnchor,constant: -5)
         
@@ -129,6 +135,7 @@ class MessageCell: UITableViewCell {
       }
     
     func configure(){
+//        backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         messageContent.text = messageItem?.content
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:a"
@@ -136,7 +143,7 @@ class MessageCell: UITableViewCell {
         if messageItem?.sender == DatabaseManager.shared.getUID(){
             leftConstraint?.isActive =  false
             rightConstraint?.isActive = true
-            messageContainer.backgroundColor = .systemMint
+            messageContainer.backgroundColor = UIColor(red: 0.165, green: 0.627, blue: 0.573, alpha: 1)
             senderName.isHidden = true
             receiverConstraint.isActive = false
             senderConstraint.isActive = false
@@ -144,7 +151,7 @@ class MessageCell: UITableViewCell {
         }else{
             leftConstraint?.isActive =  true
             rightConstraint?.isActive = false
-            messageContainer.backgroundColor = .systemGray2
+            messageContainer.backgroundColor = UIColor(red: 0.176, green: 0.22, blue: 0.243, alpha: 1)
             senderName.isHidden = false
             currentConstraint.isActive = false
             receiverConstraint.isActive = true
