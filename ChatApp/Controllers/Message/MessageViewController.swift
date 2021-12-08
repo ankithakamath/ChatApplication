@@ -32,12 +32,12 @@ class MessageViewController: UIViewController {
     
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         navigationController?.navigationBar.barTintColor = UIColor.gray
-        //view.backgroundColor = .lightGray
         title = "chats"
         validateAuth()
-        //DatabaseManager.shared.onLogout()
+        
     }
     
     @objc func didTapEdit() {
@@ -46,15 +46,19 @@ class MessageViewController: UIViewController {
     
     func configureNavBar(){
         let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-            appearance.backgroundColor = .systemMint
-            navigationController?.navigationBar.standardAppearance = appearance
-            navigationController?.navigationBar.compactAppearance = appearance
-            navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapCompose))
+        appearance.configureWithOpaqueBackground()
+        
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor(red: 0.118, green: 0.635, blue: 0.58, alpha: 1)]
+        appearance.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(didTapSearch))
+        navigationItem.rightBarButtonItem?.tintColor =  UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: UIImage(systemName: "person.3"),style: .plain, target: self, action: #selector(didTapGroupChat))
-        //view.addSubview(noMessageLabel)
+        navigationItem.leftBarButtonItem?.tintColor = UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
+        navigationItem.backBarButtonItem?.tintColor = UIColor(red: 0.047, green: 0.663, blue: 0.588, alpha: 1)
+        
         
     }
     
@@ -70,11 +74,11 @@ class MessageViewController: UIViewController {
         
     }
     @objc func didTapGroupChat(){
-      let groupVC = GroupChatViewController()
+        let groupVC = GroupChatViewController()
         navigationController?.pushViewController(groupVC, animated: true)
         
     }
-    @objc func didTapCompose(){
+    @objc func didTapSearch(){
         let vc = NewMessageViewController()
         vc.currentUser = currentUser
         vc.chats = chats
@@ -107,7 +111,7 @@ class MessageViewController: UIViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm:a"
         
-        DatabaseManager.shared.getUser(uid: DatabaseManager.shared.getUID()!) { currentUser in
+        DatabaseManager.shared.getUser(uid:  DatabaseManager.shared.getUID()!) { currentUser in
             self.currentUser = currentUser
         }
         DatabaseManager.shared.fetchChats(uid: DatabaseManager.shared.getUID()!) { chats in
@@ -124,6 +128,8 @@ class MessageViewController: UIViewController {
     func configureCollectionView(){
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
+        collectionView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "conversationCell")
@@ -136,6 +142,7 @@ extension MessageViewController: UICollectionViewDelegate,UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "conversationCell" , for: indexPath) as! CollectionViewCell
         let chat = chats[indexPath.row]
+        cell.backgroundColor =  UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         cell.messageLabel.text = chat.lastMessage?.content
         cell.chat = chat
         return cell
@@ -172,10 +179,10 @@ extension MessageViewController: UICollectionViewDelegateFlowLayout{
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        return 0
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        return 0
     }
     
 }

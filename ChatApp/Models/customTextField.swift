@@ -14,9 +14,8 @@ class CustomTextField: UITextField {
         super.init(frame: .zero)
         
         font = UIFont.systemFont(ofSize: 16)
-        textColor = .black
         self.placeholder = placeholder
-        
+        textColor = .white
     }
     
     required init?(coder: NSCoder) {

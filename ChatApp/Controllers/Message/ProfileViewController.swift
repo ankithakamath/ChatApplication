@@ -30,6 +30,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.delegate = self
         tableView.dataSource = self
@@ -47,21 +48,18 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     
     func configurenavbar(){
         let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-            appearance.backgroundColor = .systemMint
-            navigationController?.navigationBar.standardAppearance = appearance
-            navigationController?.navigationBar.compactAppearance = appearance
-            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        appearance.configureWithOpaqueBackground()
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor(red: 0.118, green: 0.635, blue: 0.58, alpha: 1)]
+        appearance.backgroundColor = UIColor(red: 0.137, green: 0.176, blue: 0.212, alpha: 1)
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
     func createTableHeader() -> UIView? {
-        
-        
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width
-                                              , height: 500))
-        headerView.backgroundColor = .white
-        
+        tableView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 500))
+        headerView.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         imageView = UIImageView(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 25, width: 250, height: 250))
         imageView.backgroundColor = .white
         imageView.layer.borderColor = UIColor.blue.cgColor
@@ -70,13 +68,15 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         nameLabel = UILabel(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 300, width: 250, height: 40))
-       // nameLabel.backgroundColor = .white
-        nameLabel.layer.borderColor = UIColor.systemMint.cgColor
-        nameLabel.layer.borderWidth = 2
+        nameLabel.layer.borderColor = UIColor.white.cgColor
+        nameLabel.layer.borderWidth = 1
         //nameLabel.text = "aaaa"
-        nameLabel.textColor = .black
+        nameLabel.textColor = UIColor(red: 0.773, green: 0.808, blue: 0.827, alpha: 1)
+        
+        nameLabel.font = UIFont(name: "PTSans-Regular", size: 17)
+        
         nameLabel.textAlignment = .center
-       // nameLabel.text = currentUser?.username
+        // nameLabel.text = currentUser?.username
         
         resetButton = UIButton(frame: CGRect(x: (headerView.frame.size.width - 250)/2, y: 350, width: 250, height: 50))
         resetButton.layer.borderColor = UIColor.systemMint.cgColor
@@ -88,6 +88,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         headerView.addSubview(imageView)
         headerView.addSubview(resetButton)
         headerView.addSubview(nameLabel)
+        
         return headerView
         
     }
@@ -95,14 +96,14 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     @objc func handleReset() {
         
         DatabaseManager.shared.resetPassword(email: currentUser!.email) { result in
-                if result == "Sent" {
-                    self.showAlert(title: "Password Reset Email Sent", messageContent: "A Password Reset link has been sent to your Email")
-                } else {
-                    self.showAlert(title: "Failed", messageContent: "Error while reseting the Password. Try Again Later")
-                }
+            if result == "Sent" {
+                self.showAlert(title: "Password Reset Email Sent", messageContent: "A Password Reset link has been sent to your Email")
+            } else {
+                self.showAlert(title: "Failed", messageContent: "Error while reseting the Password. Try Again Later")
             }
         }
-
+    }
+    
     @objc func presentImagePicker() {
         let picker = UIImagePickerController()
         picker.allowsEditing = true
@@ -125,18 +126,18 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
     }
     
     //
-//    func downloadImage(imageView: UIImageView, url: URL) {
-//        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-//            guard let data = data, error == nil else {
-//                return
-//            }
-//
-//            DispatchQueue.main.async {
-//                let image = UIImage(data: data)
-//                imageView.image = image
-//            }
-//        }).resume()
-//    }
+    //    func downloadImage(imageView: UIImageView, url: URL) {
+    //        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+    //            guard let data = data, error == nil else {
+    //                return
+    //            }
+    //
+    //            DispatchQueue.main.async {
+    //                let image = UIImage(data: data)
+    //                imageView.image = image
+    //            }
+    //        }).resume()
+    //    }
     
 }
 
@@ -150,6 +151,7 @@ extension ProfileViewController: UITableViewDelegate,UITableViewDataSource{
         cell.textLabel?.text = data[indexPath.row]
         cell.textLabel?.textAlignment = .center
         cell.textLabel?.textColor = .red
+        cell.backgroundColor = UIColor(red: 0.063, green: 0.114, blue: 0.145, alpha: 1)
         return cell
     }
     
@@ -162,7 +164,7 @@ extension ProfileViewController: UITableViewDelegate,UITableViewDataSource{
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 self.present(nav,animated: false)
-               // dismiss(animated: true)
+                // dismiss(animated: true)
             }
         }
     }

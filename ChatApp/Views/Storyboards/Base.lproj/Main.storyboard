@@ -3,6 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -59,7 +60,10 @@
         <scene sceneID="HcZ-Dc-qep">
             <objects>
                 <navigationController id="vXW-Dh-jp4" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Profile" id="6jm-Ch-mA4"/>
+                    <tabBarItem key="tabBarItem" title="Profile" id="6jm-Ch-mA4">
+                        <imageReference key="image" image="person.wave.2.fill" catalog="system" symbolScale="medium"/>
+                        <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="0.0"/>
+                    </tabBarItem>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="uWX-SO-tFE">
                         <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -80,6 +84,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="tintColor" red="0.19258823268098257" green="0.71028880767425517" blue="0.72287399736246893" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="barTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="selectedImageTintColor" red="0.1925882327" green="0.71028880770000002" blue="0.72287399740000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </tabBar>
                     <connections>
                         <segue destination="m3J-m6-cT7" kind="relationship" relationship="viewControllers" id="V1e-FM-lmz"/>
@@ -94,7 +101,10 @@
         <scene sceneID="1ex-lD-EML">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="m3J-m6-cT7" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Chats" id="cRb-9P-6Yk"/>
+                    <tabBarItem key="tabBarItem" title="Chats" image="checkmark.bubble" catalog="system" id="cRb-9P-6Yk">
+                        <color key="badgeColor" systemColor="systemGray6Color"/>
+                        <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="5"/>
+                    </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="lJy-Cw-Edw">
                         <rect key="frame" x="0.0" y="44" width="414" height="96"/>
@@ -111,8 +121,13 @@
         </scene>
     </scenes>
     <resources>
+        <image name="checkmark.bubble" catalog="system" width="128" height="110"/>
+        <image name="person.wave.2.fill" catalog="system" width="128" height="118"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray6Color">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
